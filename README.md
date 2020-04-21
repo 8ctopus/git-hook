@@ -1,6 +1,6 @@
 # gitea-deploy
 
-A simple php script to automatically git pull the latest changes on your server.
+A simple php script for Gitea users to automatically git deploy to the server.
 
 # howto
 
