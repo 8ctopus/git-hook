@@ -10,13 +10,42 @@
 define('_KEY', 'SECRET');
 
 // path to repository to pull
-define('_REPOPATH', $_SERVER['DOCUMENT_ROOT']);
+define('_REPOPATH', $_SERVER['DOCUMENT_ROOT'] .'/../');
 
 // path to logs
 define('_LOGPATH', $_SERVER['DOCUMENT_ROOT'] .'/../logs/git-hook/');
 
-
 $log_base = 'git hook - ';
+
+// get section to pull
+$section = @$_GET['section'];
+
+// check section
+if (empty($section))
+{
+    error_log($log_base .' - FAILED - no section');
+    header('HTTP/1.0 401 Unauthorized');
+    exit();
+}
+
+// add section to env name
+$log_base .= $section;
+
+switch ($section)
+{
+    case 'site':
+        $path = _REPOPATH .'public_html';
+        break;
+
+    case 'store':
+        $path = _REPOPATH .'store';
+        break;
+
+    default:
+        error_log($log_base .' - FAILED - unknown section - '. $section);
+        header('HTTP/1.0 401 Unauthorized');
+        exit();
+}
 
 // check for POST request
 if ($_SERVER['REQUEST_METHOD'] != 'POST')
@@ -90,7 +119,26 @@ if (json_last_error() !== JSON_ERROR_NONE)
 
 // prepare command
 $command  = "cd $path;";
-$command .= "/usr/bin/git pull;";
+
+if ($section == 'site')
+{
+    // pull and run composer
+    $command .= "/usr/bin/git pull 2>&1;";
+    $command .= "/usr/bin/composer install --no-interaction --no-dev 2>&1;";
+}
+else
+if ($section == 'store')
+{
+    // pull, run composer then php artisan
+    // adjust to your needs
+    $command .= "/usr/bin/git pull 2>&1;";
+    $command .= "/usr/bin/composer install --no-interaction --no-dev 2>&1;";
+    $command .= "php artisan optimize:clear 2>&1;";
+    $command .= "php artisan migrate --force 2>&1;";
+}
+else
+    // just pull
+    $command .= "/usr/bin/git pull;";
 
 // execute commands
 exec($command, $output, $status);
