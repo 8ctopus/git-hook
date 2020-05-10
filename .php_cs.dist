@@ -10,7 +10,7 @@ return (new PhpCsFixer\Config())
     ->setRules([
         '@PSR1' => true,
         'blank_line_after_namespace' => true,
-        'braces' => ['fix_missing_control_braces' => false],
+        'braces' => ['fix_missing_control_braces' => true],
         'class_definition' => true,
         'constant_case' => true,
         'elseif' => true,
@@ -138,7 +138,7 @@ return (new PhpCsFixer\Config())
         'phpdoc_no_useless_inheritdoc' => true,
         'phpdoc_return_self_reference' => true,
         'phpdoc_scalar' => true,
-        'phpdoc_separation' => true,
+        //'phpdoc_separation' => true,
         'phpdoc_single_line_var_spacing' => true,
         //'phpdoc_summary' => true,
         'phpdoc_to_comment' => true,
