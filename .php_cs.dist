@@ -10,7 +10,7 @@ return (new PhpCsFixer\Config())
     ->setRules([
         '@PSR1' => true,
         'blank_line_after_namespace' => true,
-        'braces' => ['fix_missing_control_braces' => true],
+        'braces' => true, //['fix_missing_control_braces' => true],
         'class_definition' => true,
         'constant_case' => true,
         'elseif' => true,
