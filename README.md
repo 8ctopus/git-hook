@@ -2,7 +2,7 @@
 
 A simple php script for Gitea users to automatically git deploy to the server.
 
-# howto
+## howto
 
 - Copy file `hook.php` to your project
 - Edit `hook.php`, set variables `_KEY`, `_REPOPATH` and `_LOGPATH`
@@ -18,3 +18,10 @@ A simple php script for Gitea users to automatically git deploy to the server.
 - Click `Add Webhook`
 - Once the webhook was added, click on it and scroll to the bottom and click `Test Delivery`
 - If the delivery succeeds you are all set. If it fails, go to the server and check the log.
+
+## lint code
+
+```sh
+composer install
+./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --allow-risky=yes src/*.php
+```
