@@ -1,1 +1,4 @@
+/vendor/
+
 /*.sublime-workspace
+/.php-cs-fixer.cache

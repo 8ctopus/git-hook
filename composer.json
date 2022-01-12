@@ -1,0 +1,20 @@
+{
+    "name": "8ctopus/gitea-deploy",
+    "description": "Gitea deployment hook",
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.4"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "8ctopus\\GiteaDeploy\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "8ctopus",
+            "email": "hello@octopuslabs.io"
+        }
+    ],
+    "require": {}
+}
