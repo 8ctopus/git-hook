@@ -2,7 +2,9 @@
     "name": "8ctopus/gitea-deploy",
     "description": "Gitea deployment hook",
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.4"
+        "friendsofphp/php-cs-fixer": "^3.4",
+        "phpstan/phpstan": "^1.4",
+        "phpmd/phpmd": "^2.11"
     },
     "license": "MIT",
     "autoload": {
