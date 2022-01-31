@@ -19,24 +19,22 @@ A simple php script for Gitea users to automatically git deploy to the server.
 - Once the webhook was added, click on it and scroll to the bottom and click `Test Delivery`
 - If the delivery succeeds you are all set. If it fails, go to the server and check the log.
 
-## clean code
-
-### php-cs-fixer
+## code formatting
 
 ```sh
-vendor/bin/php-cs-fixer fix --allow-risky=yes src
+vendor/bin/php-cs-fixer fix --allow-risky=yes --rules=@PhpCsFixer:risky src/
 ```
 
-# check code for problems
+## check code for problems
 
 ### phpstan
 
 ```sh
-vendor/bin/phpstan analyse --level 9 src
+vendor/bin/phpstan analyse --level 5 src/
 ```
 
 ### phpmd
 
 ```sh
-vendor/bin/phpmd src text cleancode,codesize,controversial,design,naming,unusedcode
+vendor/bin/phpmd src/ text cleancode,codesize,controversial,design,naming,unusedcode
 ```
