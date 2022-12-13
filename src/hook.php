@@ -26,7 +26,7 @@ $section = $_GET['section'] ?? '';
 if (empty($section)) {
     error_log("{$logBase} - FAILED - no section");
     http_response_code(401);
-    exit();
+    exit;
 }
 
 // add section to env name
@@ -44,14 +44,14 @@ switch ($section) {
     default:
         error_log("{$logBase} - FAILED - unknown section - {$section}");
         http_response_code(401);
-        exit();
+        exit;
 }
 
 // check for POST request
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     error_log("{$logBase} - FAILED - not POST - {$_SERVER['REQUEST_METHOD']}");
     http_response_code(401);
-    exit();
+    exit;
 }
 
 // get content type
@@ -71,14 +71,14 @@ switch ($contentType) {
     default:
         error_log("{$logBase} - FAILED - unknown content type - {$contentType}");
         http_response_code(401);
-        exit();
+        exit;
 }
 
 // check payload exists
 if (empty($payload)) {
     error_log("{$logBase} - FAILED - no payload");
     http_response_code(401);
-    exit();
+    exit;
 }
 
 // get header signature
@@ -87,7 +87,7 @@ $headerSignature = $_SERVER['HTTP_X_GITEA_SIGNATURE'] ?? '';
 if (empty($headerSignature)) {
     error_log("{$logBase} - FAILED - header signature missing");
     http_response_code(401);
-    exit();
+    exit;
 }
 
 // calculate payload signature
@@ -97,7 +97,7 @@ $payloadSignature = hash_hmac('sha256', $payload, _KEY, false);
 if ($headerSignature !== $payloadSignature) {
     error_log("{$logBase} - FAILED - payload signature");
     http_response_code(401);
-    exit();
+    exit;
 }
 
 // convert json to array
@@ -108,11 +108,11 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     error_log("{$logBase} - FAILED - json decode - " . json_last_error());
     //file_put_contents('/var/tmp/git-debug.log', var_export($payload, true));
     http_response_code(401);
-    exit();
+    exit;
 }
 
 // prepare command
-$command = "cd $path;";
+$command = "cd {$path};";
 
 if ($section === 'site') {
     // pull and run composer
@@ -156,7 +156,7 @@ foreach ($output as $str) {
 if ($status !== 0) {
     http_response_code(409);
     error_log("{$logBase} - FAILED - command return code - make sure server git remote -v contains password and git branch --set-upstream-to=origin/master master - {$outputStr}");
-    exit();
+    exit;
 }
 
 error_log("{$logBase} - OK - {$outputStr}");
