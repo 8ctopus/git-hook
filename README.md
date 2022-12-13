@@ -4,9 +4,9 @@ A simple php script for Gitea users to automatically git deploy to the server.
 
 ## howto
 
-- Copy file `hook.php` to your project
+- Copy `src/hook.php` to your project
 - Edit `hook.php`, set variables `_KEY`, `_REPOPATH` and `_LOGPATH`
-- Deploy to the script your server the classic way
+- Deploy the script to your server the classic way
 - In the Gitea project `Settings`, select `Gitea` from `Add webhook`.
 - Set `Target URL` to `http://www.example.com/api/git-hook/hook.php?section=site`
 - Set `HTTP Method` to `POST`
