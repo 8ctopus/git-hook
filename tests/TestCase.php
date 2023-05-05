@@ -18,6 +18,7 @@ abstract class TestCase extends BaseTestCase
         $_SERVER['REQUEST_PROTOCOL'] = '1.1';
 
         unset($_GET, $_POST, $_FILES);
+        unset($_SERVER['HTTP_X_GITEA_SIGNATURE']);
 
         $_GET = $getParams;
         $_POST = $postParams;

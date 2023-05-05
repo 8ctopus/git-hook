@@ -15,11 +15,46 @@ use Tests\TestCase;
  */
 final class GiteaHookTest extends TestCase
 {
-    private static string $tempDir;
+    private static array $commands;
 
     public static function setUpBeforeClass(): void
     {
-        static::$tempDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'gitea-hook-test' . DIRECTORY_SEPARATOR;
+        $path = __DIR__;
+
+        static::$commands = [
+            'site' => [
+                // pull and run composer
+                "cd {$path}",
+                "git status",
+                "composer install --no-interaction",
+            ],
+            'store' => [
+                "cd {$path}",
+                "git status",
+                "composer install --no-interaction",
+            ],
+        ];
+    }
+
+    public function testOK() : void
+    {
+        $secretKey = 'sd90sfufj';
+        $payload = 'test';
+
+        $payload = json_encode($payload);
+
+        $this->mockRequest('POST', '', [
+            'section' => 'site',
+        ], [
+            'payload' => $payload,
+        ]);
+
+        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
+
+        (new GiteaHook(static::$commands, $secretKey, null))
+            ->run();
+
+        static::assertTrue(true);
     }
 
     public function testNoSection() : void
@@ -29,7 +64,7 @@ final class GiteaHookTest extends TestCase
         static::expectException(Exception::class);
         static::expectExceptionMessage('no section');
 
-        (new GiteaHook(__DIR__, static::$tempDir, 'SECRET_KEY'))
+        (new GiteaHook(static::$commands, 'SECRET_KEY'))
             ->run();
     }
 
@@ -43,7 +78,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('unknown section - unknown');
         static::expectExceptionCode(401);
 
-        (new GiteaHook(__DIR__, static::$tempDir, 'SECRET_KEY'))
+        (new GiteaHook(static::$commands, 'SECRET_KEY'))
             ->run();
     }
 
@@ -57,7 +92,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('not a POST request - GET');
         static::expectExceptionCode(401);
 
-        (new GiteaHook(__DIR__, static::$tempDir, 'SECRET_KEY'))
+        (new GiteaHook(static::$commands, 'SECRET_KEY'))
             ->run();
     }
 
@@ -71,7 +106,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('no payload');
         static::expectExceptionCode(401);
 
-        (new GiteaHook(__DIR__, static::$tempDir, 'SECRET_KEY'))
+        (new GiteaHook(static::$commands, 'SECRET_KEY'))
             ->run();
     }
 
@@ -87,7 +122,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('header signature missing');
         static::expectExceptionCode(401);
 
-        (new GiteaHook(__DIR__, static::$tempDir, 'SECRET_KEY'))
+        (new GiteaHook(static::$commands, 'SECRET_KEY'))
             ->run();
     }
 
@@ -108,7 +143,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('payload signature');
         static::expectExceptionCode(401);
 
-        (new GiteaHook(__DIR__, static::$tempDir, $secretKey))
+        (new GiteaHook(static::$commands, $secretKey, null))
             ->run();
     }
 
@@ -129,30 +164,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('json decode - 4');
         static::expectExceptionCode(401);
 
-        (new GiteaHook(__DIR__, static::$tempDir, $secretKey))
-            ->run();
-    }
-
-    public function testSomething() : void
-    {
-        $secretKey = 'sd90sfufj';
-        $payload = 'test';
-
-        $payload = json_encode($payload);
-
-        $this->mockRequest('POST', '', [
-            'section' => 'site',
-        ], [
-            'payload' => $payload,
-        ]);
-
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
-
-        static::expectException(Exception::class);
-        static::expectExceptionMessage('json decode - 4');
-        static::expectExceptionCode(401);
-
-        (new GiteaHook(__DIR__, static::$tempDir, $secretKey))
+        (new GiteaHook(static::$commands, $secretKey, null))
             ->run();
     }
 }

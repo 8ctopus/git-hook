@@ -9,20 +9,20 @@ use Psr\Log\LoggerInterface;
 
 class GiteaHook
 {
-    private string $repoPath;
-    private ?LoggerInterface $logger;
+    private array $commands;
     private string $secretKey;
+    private ?LoggerInterface $logger;
 
     /**
      * Constructor
      *
-     * @param string $repoPath
+     * @param array $commands
      * @param string $secretKey
      * @param ?LoggerInterface $logger
      */
-    public function __construct(string $repoPath, string $secretKey, ?LoggerInterface $logger = null)
+    public function __construct(array $commands, string $secretKey, ?LoggerInterface $logger = null)
     {
-        $this->repoPath = $repoPath;
+        $this->commands = $commands;
         $this->secretKey = $secretKey;
         $this->logger = $logger;
     }
@@ -30,11 +30,11 @@ class GiteaHook
     /**
      * Run script
      *
-     * @return void
+     * @return self
      *
      * @throws Exception
      */
-    public function run() : void
+    public function run() : self
     {
         try {
             $this->logger?->info('Gitea hook started');
@@ -47,17 +47,8 @@ class GiteaHook
                 throw new Exception('no section', 401);
             }
 
-            switch ($section) {
-                case 'site':
-                    $path = $this->repoPath . 'public_html';
-                    break;
-
-                case 'store':
-                    $path = $this->repoPath . 'store';
-                    break;
-
-                default:
-                    throw new Exception("unknown section - {$section}", 401);
+            if (!array_key_exists($section, $this->commands)) {
+                throw new Exception("unknown section - {$section}", 401);
             }
 
             // check for POST request
@@ -103,48 +94,35 @@ class GiteaHook
             }
 
             // convert json to array
-            $decoded = json_decode($payload, true);
+            /* $decoded = */ json_decode($payload, true);
 
             // check for json decode errors
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception("json decode - " . json_last_error(), 401);
             }
 
-            // prepare command
-            $command = "cd {$path};";
+            foreach ($this->commands[$section] as $command) {
+                $this->logger?->info("executing command - {$command}");
 
-            if ($section === 'site') {
-                // pull and run composer
-                $command .= '/usr/bin/git pull 2>&1;';
-                $command .= '/usr/bin/composer install --no-interaction --no-dev 2>&1;';
-            } elseif ($section === 'store') {
-                // pull, run composer then php artisan
-                // adjust to your needs
-                $command .= '/usr/bin/git pull 2>&1;';
-                $command .= '/usr/bin/composer install --no-interaction --no-dev 2>&1;';
-                $command .= 'php artisan optimize:clear 2>&1;';
-                $command .= 'php artisan migrate --force 2>&1;';
-            } else {
-                // just pull
-                $command .= '/usr/bin/git pull;';
-            }
+                // execute commands
+                exec($command, $output, $status);
 
-            // execute commands
-            exec($command, $output, $status);
+                $outputStr = '';
 
-            $outputStr = '';
+                foreach ($output as $str) {
+                    $outputStr .= $str . "\n";
+                }
 
-            foreach ($output as $str) {
-                $outputStr .= $str . "\n";
-            }
-
-            // check command return code
-            if ($status !== 0) {
-                throw new Exception("command return code - make sure server git remote -v contains password and git branch --set-upstream-to=origin/master master - {$outputStr}", 409);
+                // check command return code
+                if ($status !== 0) {
+                    throw new Exception("command return code - make sure server git remote -v contains password and git branch --set-upstream-to=origin/master master - {$outputStr}", 409);
+                }
             }
         } catch (Exception $exception) {
             $this->logger?->error($exception);
             throw $exception;
         }
+
+        return $this;
     }
 }
