@@ -1,5 +1,5 @@
 {
-    "name": "8ctopus/gitea-deploy",
+    "name": "8ctopus/gitea-hook",
     "type": "library",
     "description": "Gitea deployment hook",
     "keywords": ["gitea", "deploy", "deployment", "hook"],
