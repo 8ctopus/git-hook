@@ -9,9 +9,10 @@
  *
  * curl --request POST http://localhost/?section=site --header "content-type: application/json" --header "X-GITEA-SIGNATURE: 067ba4bc638c245de6d728095f019e8171148bdc070b98f1f7376b321ccdcd62" --data '{"payload":"test"}'
  */
+
 declare(strict_types=1);
 
-use Apix\Log\Logger\File;
+use Apix\Log\Logger\Stream;
 use Oct8pus\GiteaHook;
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -38,7 +39,7 @@ $commands = [
     */
 ];
 
-$logger = new File(__DIR__ . '/test.log');
+$logger = (new Stream('php://stdout'));
 
 (new GiteaHook($commands, 'SECRET_KEY', $logger))
     ->run();
