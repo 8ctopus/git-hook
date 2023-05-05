@@ -1,5 +1,13 @@
 # gitea hook
 
+[![packagist](http://poser.pugx.org/8ctopus/gitea-hook/v)](https://packagist.org/packages/8ctopus/gitea-hook)
+[![downloads](http://poser.pugx.org/8ctopus/gitea-hook/downloads)](https://packagist.org/packages/8ctopus/gitea-hook)
+[![min php version](http://poser.pugx.org/8ctopus/gitea-hook/require/php)](https://packagist.org/packages/8ctopus/gitea-hook)
+[![license](http://poser.pugx.org/8ctopus/gitea-hook/license)](https://packagist.org/packages/8ctopus/gitea-hook)
+[![tests](https://github.com/8ctopus/gitea-hook/actions/workflows/tests.yml/badge.svg)](https://github.com/8ctopus/gitea-hook/actions/workflows/tests.yml)
+![code coverage badge](https://raw.githubusercontent.com/8ctopus/gitea-hook/image-data/coverage.svg)
+![lines of code](https://raw.githubusercontent.com/8ctopus/gitea-hook/image-data/lines.svg)
+
 A simple package to automate deployment for [Gitea](https://gitea.io/) users.
 
 ## demo
