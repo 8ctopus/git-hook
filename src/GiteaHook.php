@@ -99,7 +99,7 @@ class GiteaHook
                 throw new Exception('json decode - ' . json_last_error(), 401);
             }
 
-            $commands = is_array($this->commands[$section]) ? $this->commands[$section] : [$this->commands[$section]];
+            $commands = is_array($this->commands[$section]['commands']) ? $this->commands[$section]['commands'] : [$this->commands[$section]['commands']];
 
             foreach ($commands as $command) {
                 $this->logger?->debug("execute command - {$command}");
@@ -108,7 +108,7 @@ class GiteaHook
                     0 => ['pipe', 'r'], // stdin
                     1 => ['pipe', 'w'], // stdout
                     2 => ['pipe', 'w'], // stderr
-                ], $pipes);
+                ], $pipes, $this->commands[$section]['path']);
 
                 $stdout = stream_get_contents($pipes[1]);
                 fclose($pipes[1]);

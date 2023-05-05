@@ -19,19 +19,20 @@ final class GiteaHookTest extends TestCase
 
     public static function setUpBeforeClass() : void
     {
-        $path = __DIR__;
-
         static::$commands = [
             'site' => [
-                // pull and run composer
-                "cd {$path}",
-                'git status',
-                'composer install --no-interaction',
+                'path' => __DIR__ . '/..',
+                'commands' => [
+                    'git status',
+                    'composer install --no-interaction',
+                ],
             ],
             'store' => [
-                "cd {$path}",
-                'git status',
-                'composer install --no-interaction',
+                'path' => __DIR__ . '/../store/..',
+                'commands' => [
+                    'git status',
+                    'composer install --no-interaction',
+                ],
             ],
         ];
     }
@@ -191,7 +192,16 @@ final class GiteaHookTest extends TestCase
         $logger = new Runtime();
 
         try {
-            (new GiteaHook(['site' => 'invalid command'], $secretKey, $logger))
+            $commands = [
+                'site' => [
+                    'path' => __DIR__,
+                    'commands' => [
+                        'invalid',
+                    ],
+                ],
+            ];
+
+            (new GiteaHook($commands, $secretKey, $logger))
                 ->run();
         } catch (Exception $exception) {
             $needle = strtoupper(substr(php_uname('s'), 0, 3)) === 'WIN' ?

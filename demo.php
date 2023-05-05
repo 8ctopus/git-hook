@@ -22,22 +22,23 @@ $path = __DIR__;
 
 $commands = [
     'site' => [
-        // pull and run composer
-        "cd {$path}",
-        'git status',
-        'composer install --no-interaction',
+        'path' => $path,
+        'commands' => [
+            // pull and run composer
+            'git status',
+            'composer install --no-interaction',
+        ],
     ],
-    /*
-     * 'store' => [
-     * // pull, run composer then php artisan
-     * // adjust to your needs
-     * "cd {$path}",
-     * '/usr/bin/git pull',
-     * '/usr/bin/composer install --no-interaction --no-dev',
-     * 'php artisan optimize:clear',
-     * 'php artisan migrate --force',
-     * ],
-     */
+
+    'store' => [
+        'path' => $path,
+        'commands' => [
+            '/usr/bin/git pull',
+            '/usr/bin/composer install --no-interaction --no-dev',
+            'php artisan optimize:clear',
+            'php artisan migrate --force',
+        ],
+    ],
 ];
 
 $logger = (new Stream('php://stdout'));
