@@ -21,20 +21,14 @@ A simple php script for Gitea users to automatically git deploy to the server.
 
 ## clean code
 
-```sh
-vendor/bin/php-cs-fixer fix
-```
+    composer fix(-risky)
 
 ## check code for problems
 
 ### phpstan
 
-```sh
-vendor/bin/phpstan analyse --level 5 src/
-```
+    composer phpstan
 
 ### phpmd
 
-```sh
-vendor/bin/phpmd src/ text cleancode,codesize,controversial,design,naming,unusedcode
-```
+    composer phpmd
