@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    public function mockRequest(string $method, string $uri, array $params) : self
+    public function mockRequest(string $method, string $uri, array $getParams = [], array $postParams = []) : self
     {
         $_SERVER['HTTP_HOST'] = 'localhost';
         $_SERVER['REQUEST_METHOD'] = $method;
@@ -19,19 +19,8 @@ abstract class TestCase extends BaseTestCase
 
         unset($_GET, $_POST, $_FILES);
 
-        switch ($method) {
-            case 'HEAD':
-            case 'GET':
-                $_GET = $params;
-                break;
-
-            case 'POST':
-                $_POST = $params;
-                break;
-
-            default:
-                break;
-        }
+        $_GET = $getParams;
+        $_POST = $postParams;
 
         return $this;
     }
