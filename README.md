@@ -43,7 +43,7 @@ use Oct8pus\GiteaHook;
 // assuming script is in document_root/public/api/gitea-hook/index.php
 $documentRoot = __DIR__ . '/../../..';
 
-require_once $documentRoot . '/../../../vendor/autoload.php';
+require_once $documentRoot . '/vendor/autoload.php';
 
 $commands = [
     'site' => [
@@ -71,6 +71,14 @@ try {
         http_response_code($exception->getCode());
     }
 }
+```
+
+- update your gitea configuration in order to allow to send webhooks to your domain
+
+```ini
+[webhook]
+SKIP_TLS_VERIFY = false
+ALLOWED_HOST_LIST = octopuslabs.io
 ```
 
 - In the Gitea project, go to `Settings`, select `Gitea` from `Add webhook`.
