@@ -3,7 +3,7 @@
 /**
  * Gitea pull script
  *
- * @author 8ctopus
+ * @author 8ctopus <hello@octopuslabs.io>
  */
 
 declare(strict_types=1);
