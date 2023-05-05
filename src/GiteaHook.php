@@ -101,21 +101,20 @@ class GiteaHook
                 throw new Exception("json decode - " . json_last_error(), 401);
             }
 
-            foreach ($this->commands[$section] as $command) {
-                $this->logger?->info("executing command - {$command}");
+            $commands = is_array($this->commands[$section]) ? $this->commands[$section] : [$this->commands[$section]];
+
+            foreach ($commands as $command) {
+                $this->logger?->info("execute command - {$command}");
 
                 // execute commands
                 exec($command, $output, $status);
 
-                $outputStr = '';
-
-                foreach ($output as $str) {
-                    $outputStr .= $str . "\n";
-                }
+                $output = implode("\n", $output);
 
                 // check command return code
                 if ($status !== 0) {
-                    throw new Exception("command return code - make sure server git remote -v contains password and git branch --set-upstream-to=origin/master master - {$outputStr}", 409);
+                    // make sure server git remote -v contains password and git branch --set-upstream-to=origin/master master
+                    throw new Exception("command exit code - {$status} - {$output}", 409);
                 }
             }
         } catch (Exception $exception) {

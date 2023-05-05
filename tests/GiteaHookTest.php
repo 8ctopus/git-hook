@@ -167,4 +167,25 @@ final class GiteaHookTest extends TestCase
         (new GiteaHook(static::$commands, $secretKey, null))
             ->run();
     }
+
+    public function testInvalidCommand() : void
+    {
+        $secretKey = 'sd90sfufj';
+        $payload = json_encode('test');
+
+        $this->mockRequest('POST', '', [
+            'section' => 'site',
+        ], [
+            'payload' => $payload,
+        ]);
+
+        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
+
+        static::expectException(Exception::class);
+        static::expectExceptionMessage('command exit code - 1 - ');
+        static::expectExceptionCode(409);
+
+        (new GiteaHook(['site' => 'invalid command'], $secretKey, null))
+            ->run();
+    }
 }
