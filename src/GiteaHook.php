@@ -26,7 +26,7 @@ class GiteaHook
 
         // check section
         if (empty($section)) {
-            error_log("{$logBase} - FAILED - no section");
+            $this->errorLog("{$logBase} - FAILED - no section");
             http_response_code(401);
             return;
         }
@@ -44,14 +44,14 @@ class GiteaHook
                 break;
 
             default:
-                error_log("{$logBase} - FAILED - unknown section - {$section}");
+                $this->errorLog("{$logBase} - FAILED - unknown section - {$section}");
                 http_response_code(401);
                 return;
         }
 
         // check for POST request
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            error_log("{$logBase} - FAILED - not POST - {$_SERVER['REQUEST_METHOD']}");
+            $this->errorLog("{$logBase} - FAILED - not POST - {$_SERVER['REQUEST_METHOD']}");
             http_response_code(401);
             return;
         }
@@ -71,14 +71,14 @@ class GiteaHook
                 break;
 
             default:
-                error_log("{$logBase} - FAILED - unknown content type - {$contentType}");
+                $this->errorLog("{$logBase} - FAILED - unknown content type - {$contentType}");
                 http_response_code(401);
                 return;
         }
 
         // check payload exists
         if (empty($payload)) {
-            error_log("{$logBase} - FAILED - no payload");
+            $this->errorLog("{$logBase} - FAILED - no payload");
             http_response_code(401);
             return;
         }
@@ -87,7 +87,7 @@ class GiteaHook
         $headerSignature = $_SERVER['HTTP_X_GITEA_SIGNATURE'] ?? '';
 
         if (empty($headerSignature)) {
-            error_log("{$logBase} - FAILED - header signature missing");
+            $this->errorLog("{$logBase} - FAILED - header signature missing");
             http_response_code(401);
             return;
         }
@@ -97,7 +97,7 @@ class GiteaHook
 
         // check payload signature against header signature
         if ($headerSignature !== $payloadSignature) {
-            error_log("{$logBase} - FAILED - payload signature");
+            $this->errorLog("{$logBase} - FAILED - payload signature");
             http_response_code(401);
             return;
         }
@@ -107,7 +107,7 @@ class GiteaHook
 
         // check for json decode errors
         if (json_last_error() !== JSON_ERROR_NONE) {
-            error_log("{$logBase} - FAILED - json decode - " . json_last_error());
+            $this->errorLog("{$logBase} - FAILED - json decode - " . json_last_error());
             //file_put_contents('/var/tmp/git-debug.log', var_export($payload, true));
             http_response_code(401);
             return;
@@ -138,12 +138,12 @@ class GiteaHook
         // save log
         if (!file_exists($this->logPath)) {
             if (!mkdir($this->logPath)) {
-                error_log("{$logBase} - FAILED - create dir");
+                $this->errorLog("{$logBase} - FAILED - create dir");
             }
         }
 
         if (!file_put_contents($this->logPath . date('Ymd-H:i:s') . '.log', $command . "\n\n" . print_r($output, true))) {
-            error_log("{$logBase} - FAILED - save log");
+            $this->errorLog("{$logBase} - FAILED - save log");
         }
 
         $outputStr = '';
@@ -155,10 +155,16 @@ class GiteaHook
         // check command return code
         if ($status !== 0) {
             http_response_code(409);
-            error_log("{$logBase} - FAILED - command return code - make sure server git remote -v contains password and git branch --set-upstream-to=origin/master master - {$outputStr}");
+            $this->errorLog("{$logBase} - FAILED - command return code - make sure server git remote -v contains password and git branch --set-upstream-to=origin/master master - {$outputStr}");
             return;
         }
 
-        error_log("{$logBase} - OK - {$outputStr}");
+        $this->errorLog("{$logBase} - OK - {$outputStr}");
+    }
+
+    protected function errorLog(string $error) : self
+    {
+        error_log($error);
+        return $this;
     }
 }

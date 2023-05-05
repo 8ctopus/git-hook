@@ -12,8 +12,20 @@ use PHPUnit\Framework\TestCase;
  */
 final class GiteaHookTest extends TestCase
 {
-    public function testNothing() : void
+    public function testNoSection() : void
     {
-        static::assertTrue(true);
+        (new GiteaHookMock($_SERVER['DOCUMENT_ROOT'] . '/../', $_SERVER['DOCUMENT_ROOT'] . '/../logs/git-hook/', 'SECRET_KEY'))
+            ->run();
+
+        static::expectOutputString('git hook -  - FAILED - no section');
+    }
+}
+
+class GiteaHookMock extends GiteaHook
+{
+    protected function errorLog(string $error) : self
+    {
+        echo $error;
+        return $this;
     }
 }
