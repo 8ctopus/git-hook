@@ -24,7 +24,7 @@
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
-            "8ctopus\\GiteaDeploy\\": "src/"
+            "Oct8pus\\": "src/"
         }
     },
     "scripts": {
