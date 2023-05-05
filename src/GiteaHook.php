@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oct8pus;
 
 use Exception;
+use Psr\Log\LoggerInterface;
 
 class GiteaHook
 {
