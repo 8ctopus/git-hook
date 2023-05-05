@@ -106,15 +106,32 @@ class GiteaHook
             foreach ($commands as $command) {
                 $this->logger?->info("execute command - {$command}");
 
-                // execute commands
-                exec($command, $output, $status);
+                $process = proc_open($command, [
+                    0 => ["pipe", "r"], // stdin
+                    1 => ["pipe", "w"], // stdout
+                    2 => ["pipe", "w"], // stderr
+                ], $pipes);
 
-                $output = implode("\n", $output);
+                $stdout = stream_get_contents($pipes[1]);
+                fclose($pipes[1]);
+
+                $stderr = stream_get_contents($pipes[2]);
+                fclose($pipes[2]);
+
+                $status = proc_close($process);
+
+                if (!empty($stdout)) {
+                    $this->logger?->info($stdout);
+                }
+
+                if (!empty($stderr)) {
+                    $this->logger?->error($stderr);
+                }
 
                 // check command return code
                 if ($status !== 0) {
                     // make sure server git remote -v contains password and git branch --set-upstream-to=origin/master master
-                    throw new Exception("command exit code - {$status} - {$output}", 409);
+                    throw new Exception("command exit code - {$status}", 409);
                 }
             }
         } catch (Exception $exception) {

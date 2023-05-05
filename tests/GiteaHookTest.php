@@ -6,6 +6,7 @@ namespace Tests;
 
 use Exception;
 use Oct8pus\GiteaHook;
+use Apix\Log\Logger\Runtime;
 use Tests\TestCase;
 
 /**
@@ -51,10 +52,13 @@ final class GiteaHookTest extends TestCase
 
         $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
 
-        (new GiteaHook(static::$commands, $secretKey, null))
+        $logger = new Runtime();
+
+        (new GiteaHook(static::$commands, $secretKey, $logger))
             ->run();
 
-        static::assertTrue(true);
+        // no expection will do
+        static::assertStringContainsString('nothing to commit', implode("\n", $logger->getItems()));
     }
 
     public function testNoSection() : void
@@ -182,10 +186,19 @@ final class GiteaHookTest extends TestCase
         $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
 
         static::expectException(Exception::class);
-        static::expectExceptionMessage('command exit code - 1 - ');
+        static::expectExceptionMessage('command exit code - 1');
         static::expectExceptionCode(409);
 
-        (new GiteaHook(['site' => 'invalid command'], $secretKey, null))
-            ->run();
+        $logger = new Runtime();
+
+        try {
+            (new GiteaHook(['site' => 'invalid command'], $secretKey, $logger))
+                ->run();
+
+        } catch (Exception $exception) {
+            static::assertStringContainsString('ERROR \'invalid\' is not recognized as an internal or external command', implode("\n", $logger->getItems()));
+
+            throw $exception;
+        }
     }
 }
