@@ -195,7 +195,11 @@ final class GiteaHookTest extends TestCase
             (new GiteaHook(['site' => 'invalid command'], $secretKey, $logger))
                 ->run();
         } catch (Exception $exception) {
-            static::assertStringContainsString('ERROR \'invalid\' is not recognized as an internal or external command', implode("\n", $logger->getItems()));
+            $needle = strtoupper(substr(php_uname('s'), 0, 3)) === 'WIN' ?
+                'ERROR \'invalid\' is not recognized as an internal or external command' :
+                'invalid: not found';
+
+            static::assertStringContainsString($needle, implode("\n", $logger->getItems()));
 
             throw $exception;
         }
