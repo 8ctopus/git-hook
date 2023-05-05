@@ -24,7 +24,7 @@ curl
 
 ## usage
 
-- Create a new page such as this one in a public part of your website
+- Create a new page such as this one in a public part of your website (in this example `https://example.com/api/gitea-hook/index.php`)
 
 ```php
 declare(strict_types=1);
@@ -63,7 +63,7 @@ try {
 ```
 
 - In the Gitea project, go to `Settings`, select `Gitea` from `Add webhook`.
-- Set `Target URL` to `https://example.com/api/gitea/index.php?section=site`
+- Set `Target URL` to `https://example.com/api/gitea-hook/index.php?section=site`
 - Set `HTTP Method` to `POST`
 - Set `Post Content Type` to `application/json`
 - Set `Secret` using a strong password (same as in the script `SAME_SECRET_KEY_AS_IN_GITEA_ADMIN`)
