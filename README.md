@@ -77,6 +77,28 @@ try {
 - Once added, click on it and scroll to the bottom and click `Test Delivery`
 - If the delivery succeeds you are all set. If it fails, go to the server and check the log.
 
+_Note_: for git pulls to work using user `www-data` (the apache process usually run under that user), you probably will need to:
+
+- include the user and password (must be url encoded) inside the git remote url
+
+```
+git remote set-url origin https://user:password@example.com/gitea/site.git
+```
+
+- set the upstream
+
+```
+git branch --set-upstream-to=origin/master master
+```
+
+- make sure the `www-data` has the write permissions to the whole repository.
+
+_Note_: If you are concerned about weaker security, you can consider giving the `www-data` user permission to run git as user `ubuntu`. This way, your webserver files do not need to be writable by the `www-data` user. I'm not security specialist, so be warned.
+
+```
+sudo -H -u ubuntu -- /usr/bin/git pull;
+```
+
 ## clean code
 
     composer fix(-risky)
