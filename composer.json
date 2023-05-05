@@ -1,29 +1,36 @@
 {
     "name": "8ctopus/gitea-deploy",
+    "type": "library",
     "description": "Gitea deployment hook",
-    "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.4",
-        "phpstan/phpstan": "^1.4",
-        "phpmd/phpmd": "^2.11"
-    },
+    "keywords": ["gitea", "deploy", "deployment", "hook"],
+    "homepage": "https://github.com/8ctopus/gitea-deploy",
     "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "8ctopus\\GiteaDeploy\\": "src/"
-        }
-    },
     "authors": [
         {
             "name": "8ctopus",
             "email": "hello@octopuslabs.io"
         }
     ],
-    "require": {},
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.4",
+        "phpstan/phpstan": "^1.4",
+        "phpmd/phpmd": "^2.11"
+    },
+    "prefer-stable": true,
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "8ctopus\\GiteaDeploy\\": "src/"
+        }
+    },
     "scripts": {
         "test": "phpunit --coverage-html=coverage",
         "fix": "php-cs-fixer fix --verbose",
         "fix-risky": "php-cs-fixer fix --allow-risky=yes --verbose",
         "phpstan": "phpstan analyse --level 9 src",
-        "phpmd": "phpmd src ansi phpmd.xml"
+        "phpmd": "phpmd src/ text cleancode,codesize,controversial,design,naming,unusedcode"
     }
 }
