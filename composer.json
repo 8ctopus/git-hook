@@ -22,8 +22,8 @@
         "phpmd/phpmd": "^2.11",
         "8ctopus/apix-log": "^1.0|^2.0|^3.0"
     },
-    "prefer-stable": true,
     "minimum-stability": "stable",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Oct8pus\\": "src/"
