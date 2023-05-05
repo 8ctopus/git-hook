@@ -32,21 +32,23 @@ declare(strict_types=1);
 use Apix\Log\Logger\File;
 use Oct8pus\GiteaHook;
 
-require_once __DIR__ . '/vendor/autoload.php';
+// assuming script is in document_root/public/api/gitea-hook/index.php
+$documentRoot = __DIR__ . '/../../..';
 
-$path = __DIR__;
+require_once $documentRoot . '/../../../vendor/autoload.php';
 
 $commands = [
     'site' => [
         // adjust to your flavor
-        "cd {$path}",
+        "cd {$documentRoot}",
         '/usr/bin/git pull',
         'composer install --no-interaction --no-dev',
     ],
 ];
 
 // the logger is optional but provides useful information (any PSR-3 logger will do)
-$logger = new File(__DIR__ . '/test.log');
+// to use this logger, composer require 8ctopus/apix-log
+$logger = new File(sys_get_temp_dir() . '/gitea-hook/' . date('Y-m-d_his') . '.log');
 
 try {
     $logger->info('Gitea hook...');
@@ -57,6 +59,7 @@ try {
     $logger->notice('Gitea hook - OK');
 } catch (Exception $exception) {
     if ($exception->getCode() !== 0) {
+        // informs the webhook that the command failed
         http_response_code($exception->getCode());
     }
 }
