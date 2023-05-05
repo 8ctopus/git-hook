@@ -29,7 +29,7 @@ final class GiteaHookTest extends TestCase
         static::expectException(Exception::class);
         static::expectExceptionMessage('no section');
 
-        (new GiteaHookMock(__DIR__, static::$tempDir, 'SECRET_KEY'))
+        (new GiteaHook(__DIR__, static::$tempDir, 'SECRET_KEY'))
             ->run();
     }
 
@@ -43,7 +43,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('unknown section - unknown');
         static::expectExceptionCode(401);
 
-        (new GiteaHookMock(__DIR__, static::$tempDir, 'SECRET_KEY'))
+        (new GiteaHook(__DIR__, static::$tempDir, 'SECRET_KEY'))
             ->run();
     }
 
@@ -57,7 +57,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('not a POST request - GET');
         static::expectExceptionCode(401);
 
-        (new GiteaHookMock(__DIR__, static::$tempDir, 'SECRET_KEY'))
+        (new GiteaHook(__DIR__, static::$tempDir, 'SECRET_KEY'))
             ->run();
     }
 
@@ -71,7 +71,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('no payload');
         static::expectExceptionCode(401);
 
-        (new GiteaHookMock(__DIR__, static::$tempDir, 'SECRET_KEY'))
+        (new GiteaHook(__DIR__, static::$tempDir, 'SECRET_KEY'))
             ->run();
     }
 
@@ -87,7 +87,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('header signature missing');
         static::expectExceptionCode(401);
 
-        (new GiteaHookMock(__DIR__, static::$tempDir, 'SECRET_KEY'))
+        (new GiteaHook(__DIR__, static::$tempDir, 'SECRET_KEY'))
             ->run();
     }
 
@@ -108,7 +108,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('payload signature');
         static::expectExceptionCode(401);
 
-        (new GiteaHookMock(__DIR__, static::$tempDir, $secretKey))
+        (new GiteaHook(__DIR__, static::$tempDir, $secretKey))
             ->run();
     }
 
@@ -129,7 +129,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('json decode - 4');
         static::expectExceptionCode(401);
 
-        (new GiteaHookMock(__DIR__, static::$tempDir, $secretKey))
+        (new GiteaHook(__DIR__, static::$tempDir, $secretKey))
             ->run();
     }
 
@@ -152,16 +152,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('json decode - 4');
         static::expectExceptionCode(401);
 
-        (new GiteaHookMock(__DIR__, static::$tempDir, $secretKey))
+        (new GiteaHook(__DIR__, static::$tempDir, $secretKey))
             ->run();
-    }
-}
-
-class GiteaHookMock extends GiteaHook
-{
-    protected function errorLog(string $error) : self
-    {
-        echo $error;
-        return $this;
     }
 }

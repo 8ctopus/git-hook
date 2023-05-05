@@ -155,13 +155,5 @@ class GiteaHook
         if ($status !== 0) {
             throw new Exception("command return code - make sure server git remote -v contains password and git branch --set-upstream-to=origin/master master - {$outputStr}", 409);
         }
-
-        $this->errorLog("{$logBase} - OK - {$outputStr}");
-    }
-
-    protected function errorLog(string $error) : self
-    {
-        error_log($error);
-        return $this;
     }
 }
