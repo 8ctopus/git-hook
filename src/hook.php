@@ -1,26 +1,21 @@
 <?php
 
-/**
- * Gitea pull script
- *
- * @author 8ctopus <hello@octopuslabs.io>
- */
-
 declare(strict_types=1);
 
-// secret key
-define('_KEY', 'SECRET');
-
-// path to git repository to pull
-define('_REPO_PATH', $_SERVER['DOCUMENT_ROOT'] . '/../');
-
-// path to logs
-define('_LOG_PATH', $_SERVER['DOCUMENT_ROOT'] . '/../logs/git-hook/');
+(new Hook($_SERVER['DOCUMENT_ROOT'] . '/../', $_SERVER['DOCUMENT_ROOT'] . '/../logs/git-hook/', 'SECRET'))
+    ->run();
 
 class Hook
 {
-    public function __construct()
+    private string $repoPath;
+    private string $logPath;
+    private string $secretKey;
+
+    public function __construct(string $repoPath, string $logPath, string $secretKey)
     {
+        $this->repoPath = $repoPath;
+        $this->logPath = $logPath;
+        $this->secretKey = $secretKey;
     }
 
     public function run() : void
@@ -42,11 +37,11 @@ class Hook
 
         switch ($section) {
             case 'site':
-                $path = _REPO_PATH . 'public_html';
+                $path = $this->repoPath . 'public_html';
                 break;
 
             case 'store':
-                $path = _REPO_PATH . 'store';
+                $path = $this->repoPath . 'store';
                 break;
 
             default:
@@ -99,7 +94,7 @@ class Hook
         }
 
         // calculate payload signature
-        $payloadSignature = hash_hmac('sha256', $payload, _KEY, false);
+        $payloadSignature = hash_hmac('sha256', $payload, $this->secretKey, false);
 
         // check payload signature against header signature
         if ($headerSignature !== $payloadSignature) {
@@ -142,15 +137,13 @@ class Hook
         exec($command, $output, $status);
 
         // save log
-        $dir = _LOG_PATH;
-
-        if (!file_exists($dir)) {
-            if (!mkdir($dir)) {
+        if (!file_exists($this->logPath)) {
+            if (!mkdir($this->logPath)) {
                 error_log("{$logBase} - FAILED - create dir");
             }
         }
 
-        if (!file_put_contents($dir . date('Ymd-H:i:s') . '.log', $command . "\n\n" . print_r($output, true))) {
+        if (!file_put_contents($this->logPath . date('Ymd-H:i:s') . '.log', $command . "\n\n" . print_r($output, true))) {
             error_log("{$logBase} - FAILED - save log");
         }
 
