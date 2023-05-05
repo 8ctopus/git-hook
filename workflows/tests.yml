@@ -4,10 +4,10 @@ on:
   push:
     branches:
       - master
-#    paths:
-#      - 'src/**'
-#      - 'tests/**'
-#      - composer.json
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - composer.json
 #    paths-ignore:
 #      - '**.md'
 
