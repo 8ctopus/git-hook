@@ -7,10 +7,10 @@ A simple package to automate deployment for [Gitea](https://gitea.io/) users.
 There is a demo in the repository that you can play with:
 
 - git clone the repository
-- start the local php server: `php -S localhost:80 demo.php`
-- run the curl command
+- start a local php development server: `php -S localhost:80 demo.php`
+- run the curl request which simulates the gitea webhook
 
-```bash
+```
 curl
     --request POST http://localhost/?section=site
     --header "content-type: application/json"
@@ -23,6 +23,8 @@ curl
     composer require 8ctopus/gitea-hook
 
 ## usage
+
+- Create a new page such as this one in a public part of your website
 
 ```php
 declare(strict_types=1);
@@ -43,18 +45,28 @@ $commands = [
     ],
 ];
 
-// the logger is optional but provides useful information
+// the logger is optional but provides useful information (any PSR-3 logger will do)
 $logger = new File(__DIR__ . '/test.log');
 
-(new GiteaHook($commands, 'SAME_SECRET_KEY_AS_IN_GITEA_ADMIN', $logger))
-    ->run();
+try {
+    $logger->info('Gitea hook...');
+
+    (new GiteaHook($commands, 'SAME_SECRET_KEY_AS_IN_GITEA_ADMIN', $logger))
+        ->run();
+
+    $logger->notice('Gitea hook - OK');
+} catch (Exception $exception) {
+    if ($exception->getCode() !== 0) {
+        http_response_code($exception->getCode());
+    }
+}
 ```
 
-- In the Gitea project `Settings`, select `Gitea` from `Add webhook`.
-- Set `Target URL` to `https://www.example.com/api/git-hook/hook.php?section=site`
+- In the Gitea project, go to `Settings`, select `Gitea` from `Add webhook`.
+- Set `Target URL` to `https://example.com/api/gitea/index.php?section=site`
 - Set `HTTP Method` to `POST`
 - Set `Post Content Type` to `application/json`
-- Set `Secret` value (use some very hard to get value)
+- Set `Secret` using a strong password (same as in the script `SAME_SECRET_KEY_AS_IN_GITEA_ADMIN`)
 - Set `Trigger On` to `Push Events`
 - Set `Branch filter` to `master` or any branch you want to trigger the script
 - Check `Active`
