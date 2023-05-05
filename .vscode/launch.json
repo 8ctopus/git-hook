@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "php listen CLI",
+      "type": "php",
+      "port": 9000,
+      "stopOnEntry": false,
+      "request": "launch"
+    },
+    {
+      "name": "php run CLI",
+      "type": "php",
+      "request": "launch",
+      "program": "${file}",
+      "args": [
+        "speed",
+        "--iterations",
+        "2",
+        "--verbose",
+      ],
+      "cwd": "${fileDirname}",
+      "port": 9000,
+      "stopOnEntry": true
+    }
+  ]
+}
