@@ -37,8 +37,6 @@ class GiteaHook
     public function run() : self
     {
         try {
-            $this->logger?->info('Gitea hook started');
-
             // get section to pull
             $section = $_GET['section'] ?? '';
 
@@ -104,7 +102,7 @@ class GiteaHook
             $commands = is_array($this->commands[$section]) ? $this->commands[$section] : [$this->commands[$section]];
 
             foreach ($commands as $command) {
-                $this->logger?->info("execute command - {$command}");
+                $this->logger?->debug("execute command - {$command}");
 
                 $process = proc_open($command, [
                     0 => ["pipe", "r"], // stdin
