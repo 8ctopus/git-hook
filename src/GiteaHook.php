@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Oct8pus;
 
+use Exception;
+
 class GiteaHook
 {
     private string $repoPath;
@@ -24,6 +26,13 @@ class GiteaHook
         $this->secretKey = $secretKey;
     }
 
+    /**
+     * Run script
+     *
+     * @return void
+     *
+     * @throws Exception
+     */
     public function run() : void
     {
         $logBase = 'git hook - ';
@@ -33,9 +42,7 @@ class GiteaHook
 
         // check section
         if (empty($section)) {
-            $this->errorLog("{$logBase} - FAILED - no section");
-            http_response_code(401);
-            return;
+            throw new Exception('no section', 401);
         }
 
         // add section to env name
@@ -51,16 +58,12 @@ class GiteaHook
                 break;
 
             default:
-                $this->errorLog("{$logBase} - FAILED - unknown section - {$section}");
-                http_response_code(401);
-                return;
+                throw new Exception("unknown section - {$section}", 401);
         }
 
         // check for POST request
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            $this->errorLog("{$logBase} - FAILED - not POST - {$_SERVER['REQUEST_METHOD']}");
-            http_response_code(401);
-            return;
+            throw new Exception("not a POST request - {$_SERVER['REQUEST_METHOD']}", 401);
         }
 
         // get content type
@@ -78,25 +81,19 @@ class GiteaHook
                 break;
 
             default:
-                $this->errorLog("{$logBase} - FAILED - unknown content type - {$contentType}");
-                http_response_code(401);
-                return;
+                throw new Exception("unknown content type - {$contentType}", 401);
         }
 
         // check payload exists
         if (empty($payload)) {
-            $this->errorLog("{$logBase} - FAILED - no payload");
-            http_response_code(401);
-            return;
+            throw new Exception("{$logBase} - FAILED - no payload", 401);
         }
 
         // get header signature
-        $headerSignature = $_SERVER['HTTP_X_GITEA_SIGNATURE'] ?? '';
+        $headerSignature = $_SERVER['HTTP_X_GITEA_SIGNATURE'] ?? null;
 
         if (empty($headerSignature)) {
-            $this->errorLog("{$logBase} - FAILED - header signature missing");
-            http_response_code(401);
-            return;
+            throw new Exception("header signature missing", 401);
         }
 
         // calculate payload signature
@@ -104,9 +101,7 @@ class GiteaHook
 
         // check payload signature against header signature
         if ($headerSignature !== $payloadSignature) {
-            $this->errorLog("{$logBase} - FAILED - payload signature");
-            http_response_code(401);
-            return;
+            throw new Exception("invalid payload signature", 401);
         }
 
         // convert json to array
@@ -114,10 +109,7 @@ class GiteaHook
 
         // check for json decode errors
         if (json_last_error() !== JSON_ERROR_NONE) {
-            $this->errorLog("{$logBase} - FAILED - json decode - " . json_last_error());
-            //file_put_contents('/var/tmp/git-debug.log', var_export($payload, true));
-            http_response_code(401);
-            return;
+            throw new Exception("json decode - " . json_last_error(), 401);
         }
 
         // prepare command
@@ -145,12 +137,12 @@ class GiteaHook
         // save log
         if (!file_exists($this->logPath)) {
             if (!mkdir($this->logPath)) {
-                $this->errorLog("{$logBase} - FAILED - create dir");
+                throw new Exception("create dir", 500);
             }
         }
 
         if (!file_put_contents($this->logPath . date('Ymd-His') . '.log', $command . "\n\n" . print_r($output, true))) {
-            $this->errorLog("{$logBase} - FAILED - save log");
+            throw new Exception("save log", 500);
         }
 
         $outputStr = '';
@@ -161,9 +153,7 @@ class GiteaHook
 
         // check command return code
         if ($status !== 0) {
-            http_response_code(409);
-            $this->errorLog("{$logBase} - FAILED - command return code - make sure server git remote -v contains password and git branch --set-upstream-to=origin/master master - {$outputStr}");
-            return;
+            throw new Exception("command return code - make sure server git remote -v contains password and git branch --set-upstream-to=origin/master master - {$outputStr}", 409);
         }
 
         $this->errorLog("{$logBase} - OK - {$outputStr}");

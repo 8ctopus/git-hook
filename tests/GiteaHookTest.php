@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use Exception;
 use Oct8pus\GiteaHook;
 use Tests\TestCase;
 
@@ -25,10 +26,11 @@ final class GiteaHookTest extends TestCase
     {
         $this->mockRequest('GET', '', [], []);
 
+        static::expectException(Exception::class);
+        static::expectExceptionMessage('no section');
+
         (new GiteaHookMock(__DIR__, static::$tempDir, 'SECRET_KEY'))
             ->run();
-
-        static::expectOutputString('git hook -  - FAILED - no section');
     }
 
     public function testUnknownSection() : void
@@ -37,10 +39,12 @@ final class GiteaHookTest extends TestCase
             'section' => 'unknown',
         ]);
 
+        static::expectException(Exception::class);
+        static::expectExceptionMessage('unknown section - unknown');
+        static::expectExceptionCode(401);
+
         (new GiteaHookMock(__DIR__, static::$tempDir, 'SECRET_KEY'))
             ->run();
-
-        static::expectOutputString('git hook - unknown - FAILED - unknown section - unknown');
     }
 
     public function testNotPostRequest() : void
@@ -49,10 +53,12 @@ final class GiteaHookTest extends TestCase
             'section' => 'site',
         ]);
 
+        static::expectException(Exception::class);
+        static::expectExceptionMessage('not a POST request - GET');
+        static::expectExceptionCode(401);
+
         (new GiteaHookMock(__DIR__, static::$tempDir, 'SECRET_KEY'))
             ->run();
-
-        static::expectOutputString('git hook - site - FAILED - not POST - GET');
     }
 
     public function testNoPayload() : void
@@ -61,10 +67,12 @@ final class GiteaHookTest extends TestCase
             'section' => 'site',
         ]);
 
+        static::expectException(Exception::class);
+        static::expectExceptionMessage('no payload');
+        static::expectExceptionCode(401);
+
         (new GiteaHookMock(__DIR__, static::$tempDir, 'SECRET_KEY'))
             ->run();
-
-        static::expectOutputString('git hook - site - FAILED - no payload');
     }
 
     public function testHeaderSignatureMissing() : void
@@ -75,10 +83,12 @@ final class GiteaHookTest extends TestCase
             'payload' => 'test',
         ]);
 
+        static::expectException(Exception::class);
+        static::expectExceptionMessage('header signature missing');
+        static::expectExceptionCode(401);
+
         (new GiteaHookMock(__DIR__, static::$tempDir, 'SECRET_KEY'))
             ->run();
-
-        static::expectOutputString('git hook - site - FAILED - header signature missing');
     }
 
     public function testInvalidPayloadSignature() : void
@@ -94,10 +104,12 @@ final class GiteaHookTest extends TestCase
 
         $_SERVER['HTTP_X_GITEA_SIGNATURE'] = 'invalid signature';
 
+        static::expectException(Exception::class);
+        static::expectExceptionMessage('payload signature');
+        static::expectExceptionCode(401);
+
         (new GiteaHookMock(__DIR__, static::$tempDir, $secretKey))
             ->run();
-
-        static::expectOutputString('git hook - site - FAILED - payload signature');
     }
 
     public function testPayloadJsonDecode() : void
@@ -113,10 +125,12 @@ final class GiteaHookTest extends TestCase
 
         $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
 
+        static::expectException(Exception::class);
+        static::expectExceptionMessage('json decode - 4');
+        static::expectExceptionCode(401);
+
         (new GiteaHookMock(__DIR__, static::$tempDir, $secretKey))
             ->run();
-
-        static::expectOutputString('git hook - site - FAILED - json decode - 4');
     }
 
     public function testSomething() : void
@@ -134,10 +148,12 @@ final class GiteaHookTest extends TestCase
 
         $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
 
+        static::expectException(Exception::class);
+        static::expectExceptionMessage('json decode - 4');
+        static::expectExceptionCode(401);
+
         (new GiteaHookMock(__DIR__, static::$tempDir, $secretKey))
             ->run();
-
-        static::expectOutputString('git hook - site - FAILED - json decode - 4');
     }
 }
 
