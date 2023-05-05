@@ -28,7 +28,7 @@ class GiteaHook
         if (empty($section)) {
             error_log("{$logBase} - FAILED - no section");
             http_response_code(401);
-            exit;
+            return;
         }
 
         // add section to env name
@@ -46,14 +46,14 @@ class GiteaHook
             default:
                 error_log("{$logBase} - FAILED - unknown section - {$section}");
                 http_response_code(401);
-                exit;
+                return;
         }
 
         // check for POST request
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             error_log("{$logBase} - FAILED - not POST - {$_SERVER['REQUEST_METHOD']}");
             http_response_code(401);
-            exit;
+            return;
         }
 
         // get content type
@@ -73,14 +73,14 @@ class GiteaHook
             default:
                 error_log("{$logBase} - FAILED - unknown content type - {$contentType}");
                 http_response_code(401);
-                exit;
+                return;
         }
 
         // check payload exists
         if (empty($payload)) {
             error_log("{$logBase} - FAILED - no payload");
             http_response_code(401);
-            exit;
+            return;
         }
 
         // get header signature
@@ -89,7 +89,7 @@ class GiteaHook
         if (empty($headerSignature)) {
             error_log("{$logBase} - FAILED - header signature missing");
             http_response_code(401);
-            exit;
+            return;
         }
 
         // calculate payload signature
@@ -99,7 +99,7 @@ class GiteaHook
         if ($headerSignature !== $payloadSignature) {
             error_log("{$logBase} - FAILED - payload signature");
             http_response_code(401);
-            exit;
+            return;
         }
 
         // convert json to array
@@ -110,7 +110,7 @@ class GiteaHook
             error_log("{$logBase} - FAILED - json decode - " . json_last_error());
             //file_put_contents('/var/tmp/git-debug.log', var_export($payload, true));
             http_response_code(401);
-            exit;
+            return;
         }
 
         // prepare command
@@ -156,7 +156,7 @@ class GiteaHook
         if ($status !== 0) {
             http_response_code(409);
             error_log("{$logBase} - FAILED - command return code - make sure server git remote -v contains password and git branch --set-upstream-to=origin/master master - {$outputStr}");
-            exit;
+            return;
         }
 
         error_log("{$logBase} - OK - {$outputStr}");
