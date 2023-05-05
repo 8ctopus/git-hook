@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use Apix\Log\Logger\Runtime;
 use Exception;
 use Oct8pus\GiteaHook;
-use Apix\Log\Logger\Runtime;
-use Tests\TestCase;
 
 /**
  * @internal
@@ -18,7 +17,7 @@ final class GiteaHookTest extends TestCase
 {
     private static array $commands;
 
-    public static function setUpBeforeClass(): void
+    public static function setUpBeforeClass() : void
     {
         $path = __DIR__;
 
@@ -26,13 +25,13 @@ final class GiteaHookTest extends TestCase
             'site' => [
                 // pull and run composer
                 "cd {$path}",
-                "git status",
-                "composer install --no-interaction",
+                'git status',
+                'composer install --no-interaction',
             ],
             'store' => [
                 "cd {$path}",
-                "git status",
-                "composer install --no-interaction",
+                'git status',
+                'composer install --no-interaction',
             ],
         ];
     }

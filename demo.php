@@ -12,9 +12,8 @@
 
 declare(strict_types=1);
 
-use Apix\Log\Logger\Stream;
 use Apix\Log\Format\ConsoleColors;
-
+use Apix\Log\Logger\Stream;
 use Oct8pus\GiteaHook;
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -28,17 +27,17 @@ $commands = [
         'git status',
         'composer install --no-interaction',
     ],
-    /**
-    'store' => [
-        // pull, run composer then php artisan
-        // adjust to your needs
-        "cd {$path}",
-        '/usr/bin/git pull',
-        '/usr/bin/composer install --no-interaction --no-dev',
-        'php artisan optimize:clear',
-        'php artisan migrate --force',
-    ],
-    */
+    /*
+     * 'store' => [
+     * // pull, run composer then php artisan
+     * // adjust to your needs
+     * "cd {$path}",
+     * '/usr/bin/git pull',
+     * '/usr/bin/composer install --no-interaction --no-dev',
+     * 'php artisan optimize:clear',
+     * 'php artisan migrate --force',
+     * ],
+     */
 ];
 
 $logger = (new Stream('php://stdout'));

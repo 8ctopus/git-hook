@@ -16,8 +16,8 @@ class GiteaHook
     /**
      * Constructor
      *
-     * @param array $commands
-     * @param string $secretKey
+     * @param array            $commands
+     * @param string           $secretKey
      * @param ?LoggerInterface $logger
      */
     public function __construct(array $commands, string $secretKey, ?LoggerInterface $logger = null)
@@ -80,7 +80,7 @@ class GiteaHook
             $headerSignature = $_SERVER['HTTP_X_GITEA_SIGNATURE'] ?? null;
 
             if (empty($headerSignature)) {
-                throw new Exception("header signature missing", 401);
+                throw new Exception('header signature missing', 401);
             }
 
             // calculate payload signature
@@ -88,7 +88,7 @@ class GiteaHook
 
             // check payload signature against header signature
             if ($headerSignature !== $payloadSignature) {
-                throw new Exception("invalid payload signature", 401);
+                throw new Exception('invalid payload signature', 401);
             }
 
             // convert json to array
@@ -96,7 +96,7 @@ class GiteaHook
 
             // check for json decode errors
             if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new Exception("json decode - " . json_last_error(), 401);
+                throw new Exception('json decode - ' . json_last_error(), 401);
             }
 
             $commands = is_array($this->commands[$section]) ? $this->commands[$section] : [$this->commands[$section]];
@@ -105,9 +105,9 @@ class GiteaHook
                 $this->logger?->debug("execute command - {$command}");
 
                 $process = proc_open($command, [
-                    0 => ["pipe", "r"], // stdin
-                    1 => ["pipe", "w"], // stdout
-                    2 => ["pipe", "w"], // stderr
+                    0 => ['pipe', 'r'], // stdin
+                    1 => ['pipe', 'w'], // stdout
+                    2 => ['pipe', 'w'], // stderr
                 ], $pipes);
 
                 $stdout = stream_get_contents($pipes[1]);
