@@ -10,6 +10,13 @@ class GiteaHook
     private string $logPath;
     private string $secretKey;
 
+    /**
+     * Constructor
+     *
+     * @param string $repoPath
+     * @param string $logPath
+     * @param string $secretKey
+     */
     public function __construct(string $repoPath, string $logPath, string $secretKey)
     {
         $this->repoPath = $repoPath;
@@ -142,7 +149,7 @@ class GiteaHook
             }
         }
 
-        if (!file_put_contents($this->logPath . date('Ymd-H:i:s') . '.log', $command . "\n\n" . print_r($output, true))) {
+        if (!file_put_contents($this->logPath . date('Ymd-His') . '.log', $command . "\n\n" . print_r($output, true))) {
             $this->errorLog("{$logBase} - FAILED - save log");
         }
 

@@ -18,7 +18,7 @@ final class GiteaHookTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        static::$tempDir = sys_get_temp_dir() . '/gitea-hook-test/';
+        static::$tempDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'gitea-hook-test' . DIRECTORY_SEPARATOR;
     }
 
     public function testNoSection() : void
