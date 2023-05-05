@@ -27,6 +27,11 @@
             "Oct8pus\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "scripts": {
         "test": "phpunit --coverage-html=coverage",
         "fix": "php-cs-fixer fix --verbose",

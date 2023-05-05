@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+namespace Tests;
+
 use Oct8pus\GiteaHook;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 
 /**
  * @internal
@@ -14,6 +16,8 @@ final class GiteaHookTest extends TestCase
 {
     public function testNoSection() : void
     {
+        $this->mockRequest('GET', '', []);
+
         (new GiteaHookMock($_SERVER['DOCUMENT_ROOT'] . '/../', $_SERVER['DOCUMENT_ROOT'] . '/../logs/git-hook/', 'SECRET_KEY'))
             ->run();
 
