@@ -107,7 +107,12 @@ git remote set-url origin https://user:password@example.com/gitea/site.git
 git branch --set-upstream-to=origin/master master
 ```
 
-- make sure user `www-data` has the write permissions for the repository.
+- make sure user `www-data` is the owner of the git repository. If not
+
+```
+[2023-05-05 16:23:21] ERROR fatal: detected dubious ownership in repository at '/srv/octopuslabs/html'
+```
+
 
 _Note_: If you are concerned about weaker security, you can consider giving user `www-data` permissions to run git as another user such as `ubuntu`. This way, your webserver files can be owned by `ubuntu` and `www-data` can only read them. I'm not security specialist, so be warned.
 
