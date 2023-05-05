@@ -9,3 +9,4 @@
 # misc.
 /*.sublime-workspace
 /.php-cs-fixer.cache
+/test.log

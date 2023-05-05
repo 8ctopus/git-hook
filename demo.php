@@ -1,30 +1,44 @@
 <?php
 
+/**
+ * Demo
+ *
+ * @note to use the demo
+ *
+ * php -S localhost:80 demo.php
+ *
+ * curl --request POST http://localhost/?section=site --header "content-type: application/json" --header "X-GITEA-SIGNATURE: 067ba4bc638c245de6d728095f019e8171148bdc070b98f1f7376b321ccdcd62" --data '{"payload":"test"}'
+ */
 declare(strict_types=1);
 
+use Apix\Log\Logger\File;
 use Oct8pus\GiteaHook;
+
+require_once __DIR__ . '/vendor/autoload.php';
 
 $path = __DIR__;
 
 $commands = [
-    'site' =>
+    'site' => [
         // pull and run composer
-        <<<COMMAND
-        cd {$path};
-        /usr/bin/git pull 2>&1;
-        /usr/bin/composer install --no-interaction --no-dev 2>&1;
-        COMMAND,
-    'store' =>
+        "cd {$path}",
+        'git status',
+        'composer install --no-interaction',
+    ],
+    /**
+    'store' => [
         // pull, run composer then php artisan
         // adjust to your needs
-        <<<COMMAND
-        cd {$path};
-        /usr/bin/git pull 2>&1;
-        /usr/bin/composer install --no-interaction --no-dev 2>&1;
-        php artisan optimize:clear 2>&1;
-        php artisan migrate --force 2>&1;
-        COMMAND,
+        "cd {$path}",
+        '/usr/bin/git pull',
+        '/usr/bin/composer install --no-interaction --no-dev',
+        'php artisan optimize:clear',
+        'php artisan migrate --force',
+    ],
+    */
 ];
 
-(new GiteaHook($commands, 'SECRET_KEY', null))
+$logger = new File(__DIR__ . '/test.log');
+
+(new GiteaHook($commands, 'SECRET_KEY', $logger))
     ->run();

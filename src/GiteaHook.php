@@ -135,7 +135,7 @@ class GiteaHook
                 }
             }
         } catch (Exception $exception) {
-            $this->logger?->error($exception);
+            $this->logger?->error($exception->getMessage());
             throw $exception;
         }
 
