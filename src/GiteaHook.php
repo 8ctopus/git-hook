@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-(new Hook($_SERVER['DOCUMENT_ROOT'] . '/../', $_SERVER['DOCUMENT_ROOT'] . '/../logs/git-hook/', 'SECRET'))
-    ->run();
+namespace Oct8pus;
 
-class Hook
+class GiteaHook
 {
     private string $repoPath;
     private string $logPath;

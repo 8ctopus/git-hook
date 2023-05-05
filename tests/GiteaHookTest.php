@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
+use Oct8pus\GiteaHook;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @internal
  *
- * @coversNothing
+ * @covers \Oct8pus\GiteaHook
  */
-final class HookTest extends TestCase
+final class GiteaHookTest extends TestCase
 {
     public function testNothing() : void
     {
