@@ -87,8 +87,8 @@ class GiteaHook
                 throw new Exception('json decode - ' . json_last_error(), 401);
             }
 
-            if (!array_key_exists('name', $json['repository'])) {
-                throw new Exception("invalid json", 401);
+            if (!is_array($json) || !array_key_exists('repository', $json) || !array_key_exists('name', $json['repository'])) {
+                throw new Exception("invalid payload", 401);
             }
 
             $name = $json['repository']['name'];

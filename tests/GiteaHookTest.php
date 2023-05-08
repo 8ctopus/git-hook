@@ -137,6 +137,48 @@ final class GiteaHookTest extends TestCase
             ->run();
     }
 
+    public function testInvalidPayload() : void
+    {
+        $secretKey = 'sd90sfufj';
+        $payload = '{"test":1}';
+
+        $this->mockRequest('POST', '', [
+            'section' => 'site',
+        ], [
+            'payload' => $payload,
+        ]);
+
+        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
+
+        static::expectException(Exception::class);
+        static::expectExceptionMessage('invalid payload');
+        static::expectExceptionCode(401);
+
+        (new GiteaHook(static::$commands, $secretKey, null))
+            ->run();
+    }
+
+    public function testInvalidRepository() : void
+    {
+        $secretKey = 'sd90sfufj';
+        $payload = '{"repository": {"name": "test"}}';
+
+        $this->mockRequest('POST', '', [
+            'section' => 'site',
+        ], [
+            'payload' => $payload,
+        ]);
+
+        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
+
+        static::expectException(Exception::class);
+        static::expectExceptionMessage('invalid payload');
+        static::expectExceptionCode(401);
+
+        (new GiteaHook(static::$commands, $secretKey, null))
+            ->run();
+    }
+
     public function testPayloadJsonDecode() : void
     {
         $secretKey = 'sd90sfufj';
