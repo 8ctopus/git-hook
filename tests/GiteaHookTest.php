@@ -172,7 +172,7 @@ final class GiteaHookTest extends TestCase
         $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
 
         static::expectException(Exception::class);
-        static::expectExceptionMessage('invalid payload');
+        static::expectExceptionMessage('unknown repository - test');
         static::expectExceptionCode(401);
 
         (new GiteaHook(static::$commands, $secretKey, null))
