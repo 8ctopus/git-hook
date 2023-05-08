@@ -58,7 +58,7 @@ $commands = [
 
 // the logger is optional but provides useful information (any PSR-3 logger will do)
 // to use this logger, composer require 8ctopus/apix-log
-$logger = new File(sys_get_temp_dir() . '/gitea-hook-' . date('Y-m-d-his') . '.log');
+$logger = new File(sys_get_temp_dir() . '/gitea-hook-' . date('Y-m-d-His') . '.log');
 
 try {
     $logger->info('Gitea hook...');
