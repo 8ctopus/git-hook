@@ -22,8 +22,8 @@ There is a demo in the repository that you can play with:
 curl
     --request POST http://localhost/
     --header "content-type: application/json"
-    --header "X-GITEA-SIGNATURE: 79c1e54cfbf45e322f2a789cdd14185fc18375194994265c82c122d2f139b338"
-    --data '{"payload":{"ref":"refs/heads/master","before":"fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9","after":"fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9","total_commits":1,"repository":{"name":"site"}}}'
+    --header "X-GITEA-SIGNATURE: 2d8e4a6f3114e41f09a65195b2d69b5844e7a1a9284cdb2671354568304dd7a6"
+    --data '{"ref":"refs/heads/master", "before":"fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9", "after": "fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9", "total_commits":1, "repository":{"name": "site"}}'
 ```
 
 ## install
@@ -71,6 +71,9 @@ try {
     if ($exception->getCode() !== 0) {
         // informs the webhook that the command failed
         http_response_code($exception->getCode());
+
+        // REMOVE ME IN PRODUCTION
+        echo $exception->getMessage();
     }
 }
 ```

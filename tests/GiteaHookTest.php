@@ -39,14 +39,12 @@ final class GiteaHookTest extends TestCase
 
         static::$payload = <<<JSON
         {
-            "payload": {
-                "ref": "refs/heads/master",
-                "before":"fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9",
-                "after": "fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9",
-                "total_commits": 1,
-                "repository": {
-                    "name": "site"
-                }
+            "ref": "refs/heads/master",
+            "before":"fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9",
+            "after": "fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9",
+            "total_commits": 1,
+            "repository": {
+                "name": "site"
             }
         }
 

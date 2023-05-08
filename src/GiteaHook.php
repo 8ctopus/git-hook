@@ -87,11 +87,11 @@ class GiteaHook
                 throw new Exception('json decode - ' . json_last_error(), 401);
             }
 
-            if (!array_key_exists('payload', $json) || !array_key_exists('repository', $json['payload']) || !array_key_exists('name', $json['payload']['repository'])) {
+            if (!array_key_exists('name', $json['repository'])) {
                 throw new Exception("invalid json", 401);
             }
 
-            $name = $json['payload']['repository']['name'];
+            $name = $json['repository']['name'];
 
             if (!array_key_exists($name, $this->commands)) {
                 throw new Exception("unknown repository - {$name}", 401);
