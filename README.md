@@ -122,15 +122,14 @@ _Note_: If you are concerned about weaker security, you can consider giving user
 sudo -H -u ubuntu -- /usr/bin/git pull;
 ```
 
-~~
-_Note_: for git pulls to work using user `www-data` (the apache processes typically run under that user), you probably will need to:
+~~_Note_: for git pulls to work using user `www-data` (the apache processes typically run under that user), you probably will need to:~~
 
-- include the user and password (must be url encoded) inside the git remote url~~
+~~- include the user and password (must be url encoded) inside the git remote url~~
 
+```diff
+- git remote set-url origin https://user:password@example.com/gitea/site.git
 ```
-git remote set-url origin https://user:password@example.com/gitea/site.git
-```
-~~
+
 
 ## clean code
 
