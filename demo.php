@@ -7,7 +7,7 @@
  *
  * php -S localhost:80 demo.php
  *
- * curl --request POST http://localhost/?section=site --header "content-type: application/json" --header "X-GITEA-SIGNATURE: 067ba4bc638c245de6d728095f019e8171148bdc070b98f1f7376b321ccdcd62" --data '{"payload":"test"}'
+ * curl --request POST http://localhost/?section=site --header "content-type: application/json" --header "X-GITEA-SIGNATURE: 79c1e54cfbf45e322f2a789cdd14185fc18375194994265c82c122d2f139b338" --data '{"payload":{"ref":"refs/heads/master","before":"fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9","after": "fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9","total_commits":1,"repository":{"name":"site"}}}'
  */
 
 declare(strict_types=1);

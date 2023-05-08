@@ -16,6 +16,7 @@ use Oct8pus\GiteaHook;
 final class GiteaHookTest extends TestCase
 {
     private static array $commands;
+    private static string $payload;
 
     public static function setUpBeforeClass() : void
     {
@@ -35,22 +36,34 @@ final class GiteaHookTest extends TestCase
                 ],
             ],
         ];
+
+        static::$payload = <<<JSON
+        {
+            "payload": {
+                "ref": "refs/heads/master",
+                "before":"fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9",
+                "after": "fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9",
+                "total_commits": 1,
+                "repository": {
+                    "name": "site"
+                }
+            }
+        }
+
+        JSON;
     }
 
     public function testOK() : void
     {
         $secretKey = 'sd90sfufj';
-        $payload = 'test';
-
-        $payload = json_encode($payload);
 
         $this->mockRequest('POST', '', [
             'section' => 'site',
         ], [
-            'payload' => $payload,
+            'payload' => static::$payload,
         ]);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
+        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', static::$payload, $secretKey, false);
 
         $logger = new Runtime();
 
@@ -59,31 +72,6 @@ final class GiteaHookTest extends TestCase
 
         // no expection will do
         static::assertStringContainsString('nothing to commit', implode("\n", $logger->getItems()));
-    }
-
-    public function testNoSection() : void
-    {
-        $this->mockRequest('GET', '', [], []);
-
-        static::expectException(Exception::class);
-        static::expectExceptionMessage('no section');
-
-        (new GiteaHook(static::$commands, 'SECRET_KEY'))
-            ->run();
-    }
-
-    public function testUnknownSection() : void
-    {
-        $this->mockRequest('POST', '', [
-            'section' => 'unknown',
-        ]);
-
-        static::expectException(Exception::class);
-        static::expectExceptionMessage('unknown section - unknown');
-        static::expectExceptionCode(401);
-
-        (new GiteaHook(static::$commands, 'SECRET_KEY'))
-            ->run();
     }
 
     public function testNotPostRequest() : void
@@ -175,15 +163,14 @@ final class GiteaHookTest extends TestCase
     public function testInvalidCommand() : void
     {
         $secretKey = 'sd90sfufj';
-        $payload = json_encode('test');
 
         $this->mockRequest('POST', '', [
             'section' => 'site',
         ], [
-            'payload' => $payload,
+            'payload' => static::$payload,
         ]);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
+        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', static::$payload, $secretKey, false);
 
         static::expectException(Exception::class);
         static::expectExceptionMessage('command exit code - 1');

@@ -20,10 +20,10 @@ There is a demo in the repository that you can play with:
 
 ```
 curl
-    --request POST http://localhost/?section=site
+    --request POST http://localhost/
     --header "content-type: application/json"
-    --header "X-GITEA-SIGNATURE: 067ba4bc638c245de6d728095f019e8171148bdc070b98f1f7376b321ccdcd62"
-    --data '{"payload":"test"}'
+    --header "X-GITEA-SIGNATURE: 79c1e54cfbf45e322f2a789cdd14185fc18375194994265c82c122d2f139b338"
+    --data '{"payload":{"ref":"refs/heads/master","before":"fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9","after":"fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9","total_commits":1,"repository":{"name":"site"}}}'
 ```
 
 ## install
@@ -32,7 +32,7 @@ curl
 
 ## usage
 
-- Create a new page such as this one in a public part of your website (in this example `https://example.com/api/gitea-hook/index.php`)
+- Create a new page such as this one in a public part of your website (in this example `https://example.com/api/myhook/index.php`)
 
 ```php
 declare(strict_types=1);
@@ -40,7 +40,7 @@ declare(strict_types=1);
 use Apix\Log\Logger\File;
 use Oct8pus\GiteaHook;
 
-// assuming script is in document_root/public/api/gitea-hook/index.php
+// assuming script is in document_root/public/api/myhook/index.php
 $documentRoot = __DIR__ . '/../../..';
 
 require_once $documentRoot . '/vendor/autoload.php';
@@ -80,11 +80,11 @@ try {
 ```ini
 [webhook]
 SKIP_TLS_VERIFY = false
-ALLOWED_HOST_LIST = octopuslabs.io
+ALLOWED_HOST_LIST = example.com
 ```
 
 - In the Gitea project, go to `Settings`, select `Gitea` from `Add webhook`.
-- Set `Target URL` to `https://example.com/api/gitea-hook/index.php?section=site`
+- Set `Target URL` to `https://example.com/api/myhook/`
 - Set `HTTP Method` to `POST`
 - Set `Post Content Type` to `application/json`
 - Set `Secret` using a strong password (same as in the script `SAME_SECRET_KEY_AS_IN_GITEA_ADMIN`)
@@ -95,13 +95,7 @@ ALLOWED_HOST_LIST = octopuslabs.io
 - Once added, click on it and scroll to the bottom and click `Test Delivery`
 - If the delivery succeeds you are all set. If it fails, go to the server and check the log.
 
-_Note_: for git pulls to work using user `www-data` (the apache processes typically run under that user), you probably will need to:
-
-- include the user and password (must be url encoded) inside the git remote url
-
-```
-git remote set-url origin https://user:password@example.com/gitea/site.git
-```
+_Note_: for git pulls to work using user `www-data` (the apache typically runs under that user), you probably will need to:
 
 - set the upstream (so git knows where to pull from)
 
@@ -109,10 +103,10 @@ git remote set-url origin https://user:password@example.com/gitea/site.git
 git branch --set-upstream-to=origin/master master
 ```
 
-- make sure user `www-data` is the owner of the git repository. If not
+- make sure user `www-data` is the owner of the git repository. If not, you will get an error message like this one
 
 ```
-[2023-05-05 16:23:21] ERROR fatal: detected dubious ownership in repository at '/srv/octopuslabs/html'
+[2023-05-05 16:23:21] ERROR fatal: detected dubious ownership in repository at '/srv/example.com/html'
 ```
 
 

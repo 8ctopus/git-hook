@@ -37,18 +37,6 @@ class GiteaHook
     public function run() : self
     {
         try {
-            // get section to pull
-            $section = $_GET['section'] ?? '';
-
-            // check section
-            if (empty($section)) {
-                throw new Exception('no section', 401);
-            }
-
-            if (!array_key_exists($section, $this->commands)) {
-                throw new Exception("unknown section - {$section}", 401);
-            }
-
             // check for POST request
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 throw new Exception("not a POST request - {$_SERVER['REQUEST_METHOD']}", 401);
@@ -92,14 +80,24 @@ class GiteaHook
             }
 
             // convert json to array
-            /* $decoded = */ json_decode($payload, true);
+            $json = json_decode($payload, true);
 
             // check for json decode errors
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception('json decode - ' . json_last_error(), 401);
             }
 
-            $commands = is_array($this->commands[$section]['commands']) ? $this->commands[$section]['commands'] : [$this->commands[$section]['commands']];
+            if (!array_key_exists('payload', $json) || !array_key_exists('repository', $json['payload']) || !array_key_exists('name', $json['payload']['repository'])) {
+                throw new Exception("invalid json", 401);
+            }
+
+            $name = $json['payload']['repository']['name'];
+
+            if (!array_key_exists($name, $this->commands)) {
+                throw new Exception("unknown repository - {$name}", 401);
+            }
+
+            $commands = is_array($this->commands[$name]['commands']) ? $this->commands[$name]['commands'] : [$this->commands[$name]['commands']];
 
             foreach ($commands as $command) {
                 $this->logger?->debug("execute command - {$command}");
@@ -108,7 +106,7 @@ class GiteaHook
                     0 => ['pipe', 'r'], // stdin
                     1 => ['pipe', 'w'], // stdout
                     2 => ['pipe', 'w'], // stderr
-                ], $pipes, $this->commands[$section]['path']);
+                ], $pipes, $this->commands[$name]['path']);
 
                 $stdout = stream_get_contents($pipes[1]);
                 fclose($pipes[1]);
