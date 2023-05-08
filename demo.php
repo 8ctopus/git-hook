@@ -34,7 +34,7 @@ $commands = [
         'path' => $path,
         'commands' => [
             '/usr/bin/git pull',
-            '/usr/bin/composer install --no-interaction --no-dev',
+            '/usr/local/bin/composer install --no-interaction --no-dev',
             'php artisan optimize:clear',
             'php artisan migrate --force',
         ],
