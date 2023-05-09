@@ -216,9 +216,13 @@ abstract class AbstractHook
                 $this->logger?->error($stderr);
             }
 
-            // check command return code
+            // call user callback
+            if (array_key_exists('afterExec', $repository) && is_callable($repository['afterExec'])) {
+                call_user_func($repository['afterExec'], $this->logger, $command, $stdout, $stderr, $status);
+            }
+
+            // check command exit code
             if ($status !== 0) {
-                // make sure server git remote -v contains password and git branch --set-upstream-to=origin/master master
                 throw new Exception("command exit code - {$status}", 409);
             }
         }

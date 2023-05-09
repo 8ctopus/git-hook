@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 use Apix\Log\Format\ConsoleColors;
 use Apix\Log\Logger\Stream;
+use Apix\Log\Logger;
 use Oct8pus\GitHubHook;
+use Psr\Log\LoggerInterface;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -37,6 +39,16 @@ $commands = [
             'git status',
             'composer install --no-interaction',
         ],
+        // it's also possible to define a callback after commands were executed
+        'afterExec' => function (?LoggerInterface $logger, string $command, string $stdout, string $stderr, string $status) : void {
+            if ($command === 'git status') {
+                if (str_contains($stdout, 'Your branch is up to date with') || str_contains($stdout, 'nothing to commit, working tree clean')) {
+                    return;
+                }
+
+                $logger->error('Git status');
+            }
+        }
     ],
 
     // an example for laravel
@@ -51,16 +63,20 @@ $commands = [
     ],
 ];
 
-$logger = (new Stream('php://stdout'));
-$logger->setFormat(new ConsoleColors());
-
 try {
+    $logger = (new Stream('php://stdout'));
+    $logger->setFormat(new ConsoleColors());
+
     $logger->debug('Git hook...');
 
     (new GitHubHook($commands, 'SECRET_KEY', $logger))
         ->run();
 
-    $logger->notice('Git hook - OK');
+    if ($logger->getMinLevelLogged() >= Logger::getLevelCode('notice')) {
+        $logger->notice('Git hook - OK');
+    } else {
+        $logger->error('Git hook - FAILED');
+    }
 } catch (Exception $exception) {
     if ($exception->getCode() !== 0) {
         http_response_code($exception->getCode());
