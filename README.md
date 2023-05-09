@@ -42,7 +42,9 @@ $documentRoot = __DIR__ . '/../../..';
 require_once $documentRoot . '/vendor/autoload.php';
 
 $commands = [
+    // repository name eg. https://github.com/8ctopus/site
     'site' => [
+        // directory in which commands will be executed
         'path' => $documentRoot,
         'commands' => [
             // adjust to your flavor
