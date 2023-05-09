@@ -30,8 +30,8 @@ $commands = [
         ],
     ],
 
-    // ngrok
-    'gitea-hook' => [
+    // ngrok local test
+    'git-hook' => [
         'path' => $path,
         'commands' => [
             'git status',
