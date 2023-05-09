@@ -49,7 +49,7 @@ abstract class AbstractHook
 
             // validate json
             if (!is_array($json) || !array_key_exists('repository', $json) || !array_key_exists('name', $json['repository'])) {
-                throw new Exception("invalid payload", 401);
+                throw new Exception('invalid payload', 401);
             }
 
             $this->runCommands($json);
@@ -115,7 +115,8 @@ abstract class AbstractHook
     /**
      * Decode payload
      *
-     * @param  string $payload
+     * @param string $payload
+     *
      * @return array
      *
      * @throws Exception
@@ -145,8 +146,8 @@ abstract class AbstractHook
     /**
      * Validate signature
      *
-     * @param  string $payload
-     * @param  string $headerSignature
+     * @param string $payload
+     * @param string $headerSignature
      *
      * @return void
      *
@@ -213,6 +214,5 @@ abstract class AbstractHook
                 throw new Exception("command exit code - {$status}", 409);
             }
         }
-
     }
 }

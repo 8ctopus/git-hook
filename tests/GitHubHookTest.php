@@ -38,7 +38,7 @@ final class GitHubHookTest extends TestCase
             ],
         ];
 
-        static::$payload = <<<JSON
+        static::$payload = <<<'JSON'
         {
             "ref": "refs/heads/master",
             "before":"fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9",
