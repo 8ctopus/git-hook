@@ -12,17 +12,15 @@ Automate deployment for git pushes to [GitHub](https://github.com) and [Gitea](h
 
 ## demo
 
-There is a demo in the repository that you can play with:
-
 - git clone the repository
 - start a local php development server: `php -S localhost:80 demo.php`
 - run the curl request which simulates the webhook request
 
 ```
-curl
-    --request POST http://localhost/
-    --header "content-type: application/json"
-    --header "X-HUB-SIGNATURE-256: 2d8e4a6f3114e41f09a65195b2d69b5844e7a1a9284cdb2671354568304dd7a6"
+curl \
+    --request POST http://localhost/ \
+    --header "content-type: application/json" \
+    --header "X-HUB-SIGNATURE-256: 2d8e4a6f3114e41f09a65195b2d69b5844e7a1a9284cdb2671354568304dd7a6" \
     --data '{"ref":"refs/heads/master", "before":"fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9", "after": "fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9", "total_commits":1, "repository":{"name": "site"}}'
 ```
 
