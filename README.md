@@ -190,13 +190,13 @@ The deployment script can be easily debugged locally using [ngrok](https://ngrok
 
 - run ngrok `ngrok http 80`
 
-- update the `Payload URL` for Github and `Target URL` for Gitea to the ngrok address, similar to this one `https://6daf-31-218-13-51.ngrok-free.app`
+- update the `Payload URL` for Github or `Target URL` for Gitea to the ngrok address, similar to this one `https://6daf-31-218-13-51.ngrok-free.app`
 
 - run the php local server `php -S localhost:80 demo.php`
 
 - start visual studio code debugging and set a breakpoint in `demo.php`
 
-- In Github/Gitea, resend the webhook request
+- resend the webhook request
 
 ## clean code
 
@@ -209,4 +209,3 @@ The deployment script can be easily debugged locally using [ngrok](https://ngrok
 ## phpmd
 
     composer phpmd
-
