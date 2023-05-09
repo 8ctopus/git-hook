@@ -212,6 +212,56 @@ final class GiteaHookTest extends TestCase
             ->run();
     }
 
+    public function testPathMissing() : void
+    {
+        $secretKey = 'sd90sfufj';
+
+        $this->mockRequest('POST', '', [], [
+            'payload' => static::$payload,
+        ]);
+
+        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', static::$payload, $secretKey, false);
+
+        static::expectException(Exception::class);
+        static::expectExceptionMessage('path missing - site');
+        static::expectExceptionCode(401);
+
+        $commands = [
+            'site' => [
+                'commands' => [
+                    'invalid',
+                ],
+            ],
+        ];
+
+        (new GiteaHook($commands, $secretKey))
+            ->run();
+    }
+
+    public function testCommandsMissing() : void
+    {
+        $secretKey = 'sd90sfufj';
+
+        $this->mockRequest('POST', '', [], [
+            'payload' => static::$payload,
+        ]);
+
+        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', static::$payload, $secretKey, false);
+
+        static::expectException(Exception::class);
+        static::expectExceptionMessage('commands missing - site');
+        static::expectExceptionCode(401);
+
+        $commands = [
+            'site' => [
+                'path' => __DIR__,
+            ],
+        ];
+
+        (new GiteaHook($commands, $secretKey))
+            ->run();
+    }
+
     public function testInvalidCommand() : void
     {
         $secretKey = 'sd90sfufj';
