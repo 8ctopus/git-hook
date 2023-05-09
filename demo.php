@@ -30,7 +30,16 @@ $commands = [
         ],
     ],
 
-    'store' => [
+    'gitea-hook' => [
+        'path' => $path,
+        'commands' => [
+            // pull and run composer
+            'git status',
+            'composer install --no-interaction',
+        ],
+    ],
+
+    'laravel' => [
         'path' => $path,
         'commands' => [
             '/usr/bin/git pull',

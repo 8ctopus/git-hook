@@ -6,15 +6,15 @@ namespace Tests;
 
 use Apix\Log\Logger\Runtime;
 use Exception;
-use Oct8pus\GiteaHook;
+use Oct8pus\GitHubHook;
 
 /**
  * @internal
  *
  * @covers \Oct8pus\AbstractHook
- * @covers \Oct8pus\GiteaHook
+ * @covers \Oct8pus\GitHubHook
  */
-final class GiteaHookTest extends TestCase
+final class GitHubHookTest extends TestCase
 {
     private static array $commands;
     private static string $payload;
@@ -62,11 +62,11 @@ final class GiteaHookTest extends TestCase
             'payload' => static::$payload,
         ]);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', static::$payload, $secretKey, false);
+        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = 'sha256=' . hash_hmac('sha256', static::$payload, $secretKey, false);
 
         $logger = new Runtime();
 
-        (new GiteaHook(static::$commands, $secretKey, $logger))
+        (new GitHubHook(static::$commands, $secretKey, $logger))
             ->run();
 
         // no expection will do
@@ -83,7 +83,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('not a POST request - GET');
         static::expectExceptionCode(401);
 
-        (new GiteaHook(static::$commands, 'SECRET_KEY'))
+        (new GitHubHook(static::$commands, 'SECRET_KEY'))
             ->run();
     }
 
@@ -97,7 +97,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('no payload');
         static::expectExceptionCode(401);
 
-        (new GiteaHook(static::$commands, 'SECRET_KEY'))
+        (new GitHubHook(static::$commands, 'SECRET_KEY'))
             ->run();
     }
 
@@ -113,7 +113,7 @@ final class GiteaHookTest extends TestCase
         static::expectExceptionMessage('header signature missing');
         static::expectExceptionCode(401);
 
-        (new GiteaHook(static::$commands, 'SECRET_KEY'))
+        (new GitHubHook(static::$commands, 'SECRET_KEY'))
             ->run();
     }
 
@@ -128,13 +128,13 @@ final class GiteaHookTest extends TestCase
             'payload' => $payload,
         ]);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = 'invalid signature';
+        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = 'invalid signature';
 
         static::expectException(Exception::class);
         static::expectExceptionMessage('payload signature');
         static::expectExceptionCode(401);
 
-        (new GiteaHook(static::$commands, $secretKey, null))
+        (new GitHubHook(static::$commands, $secretKey, null))
             ->run();
     }
 
@@ -149,13 +149,13 @@ final class GiteaHookTest extends TestCase
             'payload' => $payload,
         ]);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
+        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = hash_hmac('sha256', $payload, $secretKey, false);
 
         static::expectException(Exception::class);
         static::expectExceptionMessage('invalid payload');
         static::expectExceptionCode(401);
 
-        (new GiteaHook(static::$commands, $secretKey, null))
+        (new GitHubHook(static::$commands, $secretKey, null))
             ->run();
     }
 
@@ -170,13 +170,13 @@ final class GiteaHookTest extends TestCase
             'payload' => $payload,
         ]);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
+        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = hash_hmac('sha256', $payload, $secretKey, false);
 
         static::expectException(Exception::class);
         static::expectExceptionMessage('unknown repository - test');
         static::expectExceptionCode(401);
 
-        (new GiteaHook(static::$commands, $secretKey, null))
+        (new GitHubHook(static::$commands, $secretKey, null))
             ->run();
     }
 
@@ -191,13 +191,13 @@ final class GiteaHookTest extends TestCase
             'payload' => $payload,
         ]);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, $secretKey, false);
+        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = hash_hmac('sha256', $payload, $secretKey, false);
 
         static::expectException(Exception::class);
         static::expectExceptionMessage('json decode - 4');
         static::expectExceptionCode(401);
 
-        (new GiteaHook(static::$commands, $secretKey, null))
+        (new GitHubHook(static::$commands, $secretKey, null))
             ->run();
     }
 
@@ -211,7 +211,7 @@ final class GiteaHookTest extends TestCase
             'payload' => static::$payload,
         ]);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', static::$payload, $secretKey, false);
+        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = hash_hmac('sha256', static::$payload, $secretKey, false);
 
         static::expectException(Exception::class);
         static::expectExceptionMessage('command exit code - 1');
@@ -229,7 +229,7 @@ final class GiteaHookTest extends TestCase
                 ],
             ];
 
-            (new GiteaHook($commands, $secretKey, $logger))
+            (new GitHubHook($commands, $secretKey, $logger))
                 ->run();
         } catch (Exception $exception) {
             $needle = strtoupper(substr(php_uname('s'), 0, 3)) === 'WIN' ?

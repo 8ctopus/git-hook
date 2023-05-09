@@ -6,16 +6,17 @@ namespace Oct8pus;
 
 use Exception;
 
-class GiteaHook extends AbstractHook
+class GitHubHook extends AbstractHook
 {
     protected function headerSignature() : string
     {
-        $signature = $_SERVER['HTTP_X_GITEA_SIGNATURE'] ?? null;
+        // get header signature
+        $signature = $_SERVER['HTTP_X_HUB_SIGNATURE_256'] ?? null;
 
         if (empty($signature)) {
             throw new Exception('header signature missing', 401);
         }
 
-        return $signature;
+        return str_replace('sha256=', '', $signature);
     }
 }

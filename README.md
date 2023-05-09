@@ -139,3 +139,7 @@ sudo -H -u ubuntu -- /usr/bin/git pull;
 ## phpmd
 
     composer phpmd
+
+## ngrok testing
+
+    ngrok http 80
