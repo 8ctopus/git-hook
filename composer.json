@@ -1,9 +1,9 @@
 {
-    "name": "8ctopus/gitea-hook",
+    "name": "8ctopus/git-hook",
     "type": "library",
-    "description": "Gitea deployment hook",
-    "keywords": ["gitea", "deploy", "deployment", "hook"],
-    "homepage": "https://github.com/8ctopus/gitea-deploy",
+    "description": "Automate deployment for git pushes to GitHub and Gitea",
+    "keywords": ["github", "gitea", "git", "deployment", "hook"],
+    "homepage": "https://github.com/8ctopus/git-hook",
     "license": "MIT",
     "authors": [
         {
