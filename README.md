@@ -8,7 +8,7 @@
 ![code coverage badge](https://raw.githubusercontent.com/8ctopus/git-hook/image-data/coverage.svg)
 ![lines of code](https://raw.githubusercontent.com/8ctopus/git-hook/image-data/lines.svg)
 
-Automate deployment for git pushes to [GitHub](https://github.com) and [Gitea](https://gitea.io).
+Automate deployment for git pushes to [GitHub](https://github.com) and [Gitea](https://gitea.io) using webhooks.
 
 ## demo
 
