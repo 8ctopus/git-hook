@@ -9,7 +9,7 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractHook
 {
-    protected array $commands;
+    protected array $config;
     protected string $secretKey;
     protected ?LoggerInterface $logger;
 
@@ -22,7 +22,7 @@ abstract class AbstractHook
      */
     public function __construct(array $commands, string $secretKey, ?LoggerInterface $logger = null)
     {
-        $this->commands = $commands;
+        $this->config = $commands;
         $this->secretKey = $secretKey;
         $this->logger = $logger;
     }
@@ -45,14 +45,28 @@ abstract class AbstractHook
 
             $this->validateSignature($payload, $signature);
 
-            $json = $this->decodePayload($payload);
+            $payload = $this->decodePayload($payload);
 
             // validate json
-            if (!is_array($json) || !array_key_exists('repository', $json) || !array_key_exists('name', $json['repository'])) {
+            if (!is_array($payload) || !array_key_exists('repository', $payload) || !array_key_exists('name', $payload['repository'])) {
                 throw new Exception('invalid payload', 401);
             }
 
-            $this->runCommands($json);
+            $name = $payload['repository']['name'];
+
+            if (!array_key_exists($name, $this->config)) {
+                throw new Exception("unknown repository - {$name}", 401);
+            }
+
+            if (!array_key_exists('path', $this->config[$name])) {
+                throw new Exception("path missing - {$name}", 401);
+            }
+
+            if (!array_key_exists('commands', $this->config[$name])) {
+                throw new Exception("commands missing - {$name}", 401);
+            }
+
+            $this->runCommands($this->config[$name]);
         } catch (Exception $exception) {
             $this->logger?->error($exception->getMessage());
             throw $exception;
@@ -113,28 +127,6 @@ abstract class AbstractHook
     }
 
     /**
-     * Decode payload
-     *
-     * @param string $payload
-     *
-     * @return array
-     *
-     * @throws Exception
-     */
-    protected function decodePayload(string $payload) : array
-    {
-        // convert json to array
-        $json = json_decode($payload, true);
-
-        // check for json decode errors
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new Exception('json decode - ' . json_last_error(), 401);
-        }
-
-        return $json;
-    }
-
-    /**
      * Get header signature
      *
      * @returns string
@@ -165,23 +157,39 @@ abstract class AbstractHook
     }
 
     /**
+     * Decode payload
+     *
+     * @param string $payload
+     *
+     * @return array
+     *
+     * @throws Exception
+     */
+    protected function decodePayload(string $payload) : array
+    {
+        // convert json to array
+        $json = json_decode($payload, true);
+
+        // check for json decode errors
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception('json decode - ' . json_last_error(), 401);
+        }
+
+        return $json;
+    }
+
+    /**
      * Run commands
      *
-     * @param array $json
+     * @param array $repository
      *
      * @return void
      *
      * @throws Exception
      */
-    protected function runCommands(array $json) : void
+    protected function runCommands(array $repository) : void
     {
-        $name = $json['repository']['name'];
-
-        if (!array_key_exists($name, $this->commands)) {
-            throw new Exception("unknown repository - {$name}", 401);
-        }
-
-        $commands = is_array($this->commands[$name]['commands']) ? $this->commands[$name]['commands'] : [$this->commands[$name]['commands']];
+        $commands = is_array($repository['commands']) ? $repository['commands'] : [$repository['commands']];
 
         foreach ($commands as $command) {
             $this->logger?->debug("execute command - {$command}");
@@ -190,7 +198,7 @@ abstract class AbstractHook
                 0 => ['pipe', 'r'], // stdin
                 1 => ['pipe', 'w'], // stdout
                 2 => ['pipe', 'w'], // stderr
-            ], $pipes, $this->commands[$name]['path']);
+            ], $pipes, $repository['path']);
 
             $stdout = stream_get_contents($pipes[1]);
             fclose($pipes[1]);
