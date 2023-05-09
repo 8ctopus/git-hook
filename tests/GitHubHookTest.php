@@ -67,7 +67,7 @@ final class GitHubHookTest extends TestCase
         (new GitHubHook(static::$commands, $secretKey, $logger))
             ->run();
 
-        // no expection will do
+        // no exception will do
         static::assertStringContainsString('nothing to commit', implode("\n", $logger->getItems()));
     }
 

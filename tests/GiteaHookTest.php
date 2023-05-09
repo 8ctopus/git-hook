@@ -7,6 +7,7 @@ namespace Tests;
 use Apix\Log\Logger\Runtime;
 use Exception;
 use Oct8pus\GiteaHook;
+use Psr\Log\LoggerInterface;
 
 /**
  * @internal
@@ -67,8 +68,34 @@ final class GiteaHookTest extends TestCase
         (new GiteaHook(static::$commands, $secretKey, $logger))
             ->run();
 
-        // no expection will do
+        // no exception will do
         static::assertStringContainsString('nothing to commit', implode("\n", $logger->getItems()));
+    }
+
+    public function testCallbackOK() : void
+    {
+        $secretKey = 'sd90sfufj';
+
+        $this->mockRequest('POST', '', [], [
+            'payload' => static::$payload,
+        ]);
+
+        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', static::$payload, $secretKey, false);
+
+        $logger = new Runtime();
+
+        $callback = false;
+
+        $commands = static::$commands;
+
+        $commands['site']['afterExec'] = function(?LoggerInterface $logger, string $command, string $stdout, string $stderr, string $status) use (&$callback) : void {
+            $callback = true;
+        };
+
+        (new GiteaHook($commands, $secretKey, $logger))
+            ->run();
+
+        static::assertTrue($callback);
     }
 
     public function testNotPostRequest() : void
