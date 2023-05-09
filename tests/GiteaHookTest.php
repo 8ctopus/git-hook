@@ -56,9 +56,7 @@ final class GiteaHookTest extends TestCase
     {
         $secretKey = 'sd90sfufj';
 
-        $this->mockRequest('POST', '', [
-            'section' => 'site',
-        ], [
+        $this->mockRequest('POST', '', [], [
             'payload' => static::$payload,
         ]);
 
@@ -75,9 +73,7 @@ final class GiteaHookTest extends TestCase
 
     public function testNotPostRequest() : void
     {
-        $this->mockRequest('GET', '', [
-            'section' => 'site',
-        ]);
+        $this->mockRequest('GET', '', []);
 
         static::expectException(Exception::class);
         static::expectExceptionMessage('not a POST request - GET');
@@ -89,9 +85,7 @@ final class GiteaHookTest extends TestCase
 
     public function testNoPayload() : void
     {
-        $this->mockRequest('POST', '', [
-            'section' => 'site',
-        ]);
+        $this->mockRequest('POST', '', []);
 
         static::expectException(Exception::class);
         static::expectExceptionMessage('no payload');
@@ -103,9 +97,7 @@ final class GiteaHookTest extends TestCase
 
     public function testHeaderSignatureMissing() : void
     {
-        $this->mockRequest('POST', '', [
-            'section' => 'site',
-        ], [
+        $this->mockRequest('POST', '', [], [
             'payload' => 'test',
         ]);
 
@@ -122,9 +114,7 @@ final class GiteaHookTest extends TestCase
         $secretKey = 'sd90sfufj';
         $payload = 'test';
 
-        $this->mockRequest('POST', '', [
-            'section' => 'site',
-        ], [
+        $this->mockRequest('POST', '', [], [
             'payload' => $payload,
         ]);
 
@@ -143,9 +133,7 @@ final class GiteaHookTest extends TestCase
         $secretKey = 'sd90sfufj';
         $payload = '{"test":1}';
 
-        $this->mockRequest('POST', '', [
-            'section' => 'site',
-        ], [
+        $this->mockRequest('POST', '', [], [
             'payload' => $payload,
         ]);
 
@@ -164,9 +152,7 @@ final class GiteaHookTest extends TestCase
         $secretKey = 'sd90sfufj';
         $payload = '{"repository": {"name": "test"}}';
 
-        $this->mockRequest('POST', '', [
-            'section' => 'site',
-        ], [
+        $this->mockRequest('POST', '', [], [
             'payload' => $payload,
         ]);
 
@@ -185,9 +171,7 @@ final class GiteaHookTest extends TestCase
         $secretKey = 'sd90sfufj';
         $payload = 'test';
 
-        $this->mockRequest('POST', '', [
-            'section' => 'site',
-        ], [
+        $this->mockRequest('POST', '', [], [
             'payload' => $payload,
         ]);
 
@@ -205,9 +189,7 @@ final class GiteaHookTest extends TestCase
     {
         $secretKey = 'sd90sfufj';
 
-        $this->mockRequest('POST', '', [
-            'section' => 'site',
-        ], [
+        $this->mockRequest('POST', '', [], [
             'payload' => static::$payload,
         ]);
 
