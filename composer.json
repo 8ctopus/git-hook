@@ -41,5 +41,8 @@
         "fix-risky": "php-cs-fixer fix --allow-risky=yes --verbose",
         "phpstan": "phpstan analyse --level 9 src",
         "phpmd": "phpmd src/ text cleancode,codesize,controversial,design,naming,unusedcode"
+    },
+    "replace": {
+        "8ctopus/gitea-hook": "*"
     }
 }
