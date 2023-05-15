@@ -229,9 +229,13 @@ abstract class AbstractHook
             }
 
             // call command callback
-            if (isset($callback) && is_callable($callback)) {
-                if (call_user_func($callback, $this->logger, $command, $stdout, $stderr, $status) === false) {
-                    throw new Exception("command callback returned false", 409);
+            if (isset($callback)) {
+                if (is_callable($callback)) {
+                    if (call_user_func($callback, $this->logger, $command, $stdout, $stderr, $status) === false) {
+                        throw new Exception("command callback returned false", 409);
+                    }
+                } else {
+                    $this->logger?->error('invalid command callback');
                 }
             }
 
@@ -245,7 +249,7 @@ abstract class AbstractHook
                             throw new Exception("global callback returned false", 409);
                         }
                     } else {
-                        $this->logger?->error('invalid callback');
+                        $this->logger?->error('invalid global callback');
                     }
                 }
             }
