@@ -186,6 +186,31 @@ sudo -H -u ubuntu -- /usr/bin/git pull;
 - git remote set-url origin https://user:password@example.com/gitea/site.git
 ```
 
+## callbacks
+
+Callbacks can be implemented per command or for every command:
+
+```php
+$commands = [
+    'site' => [
+        'path' => $path,
+        'commands' => [
+            'git status' => commandCallback(...),
+            'composer install --no-interaction',
+        ],
+        'afterExec' => globalCallback(...),
+    ],
+];
+```
+
+Both callbacks have the same signature
+
+```php
+function callback(?LoggerInterface $logger, string $command, string $stdout, string $stderr, string $status) : bool
+```
+
+Returning false aborts the deployment
+
 ## debugging
 
 The deployment script can be easily debugged locally using [ngrok](https://ngrok.com/).
