@@ -26,9 +26,8 @@ $commands = [
     'site' => [
         'path' => $path,
         'commands' => [
-            // pull and run composer
             'git status',
-            'composer install --no-interaction',
+            'composer install --no-interaction --no-dev',
         ],
     ],
 
