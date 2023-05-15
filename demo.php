@@ -28,6 +28,7 @@ $commands = [
         'commands' => [
             'git status' => checkGitStatus(...),
             'composer install --no-interaction',
+            'git branch' => checkGitBranch(...),
         ],
         // it's also possible to define a global callback
         'afterExec' => genericCallback(...),
@@ -81,6 +82,17 @@ try {
     }
 }
 
+/**
+ * Check git is clean
+ *
+ * @param ?LoggerInterface $logger
+ * @param string $command
+ * @param string $stdout
+ * @param string $stderr
+ * @param string $status
+ *
+ * @return bool
+ */
 function checkGitStatus(?LoggerInterface $logger, string $command, string $stdout, string $stderr, string $status) : bool
 {
     if (str_contains($stdout, 'Your branch is up to date with') || str_contains($stdout, 'nothing to commit, working tree clean')) {
@@ -88,6 +100,23 @@ function checkGitStatus(?LoggerInterface $logger, string $command, string $stdou
     }
 
     $logger?->error('git status');
+    return false;
+}
+
+function checkGitBranch(?LoggerInterface $logger, string $command, string $stdout, string $stderr, string $status) : bool
+{
+    if (preg_match('/^\* ([a-zA-Z]*)$/', $stdout, $matches) !== 1) {
+        $logger?->error('detect branch');
+        return false;
+    }
+
+    $branch = $matches[1];
+
+    if ($branch === 'master') {
+        return true;
+    }
+
+    $logger?->error("not on master branch - {$branch}");
     return false;
 }
 
