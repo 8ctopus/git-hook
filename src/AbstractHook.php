@@ -221,8 +221,16 @@ abstract class AbstractHook
             }
 
             // call user callback
-            if (array_key_exists('afterExec', $repository) && is_callable($repository['afterExec'])) {
-                call_user_func($repository['afterExec'], $this->logger, $command, $stdout, $stderr, $status);
+            if (array_key_exists('afterExec', $repository)) {
+                $callbacks = is_array($repository['afterExec']) ? $repository['afterExec'] : [$repository['afterExec']];
+
+                foreach ($callbacks as $callback) {
+                    if (is_callable($callback)) {
+                        call_user_func($callback, $this->logger, $command, $stdout, $stderr, $status);
+                    } else {
+                        $this->logger?->error('invalid callback');
+                    }
+                }
             }
 
             // check command exit code
