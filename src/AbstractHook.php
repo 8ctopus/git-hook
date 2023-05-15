@@ -213,7 +213,11 @@ abstract class AbstractHook
             }
 
             if (!empty($stderr)) {
-                $this->logger?->error($stderr);
+                if ($status === 0) {
+                    $this->logger?->info($stderr);
+                } else {
+                    $this->logger?->error($stderr);
+                }
             }
 
             // call user callback
