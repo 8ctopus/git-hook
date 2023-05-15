@@ -26,38 +26,34 @@ $commands = [
     'site' => [
         'path' => $path,
         'commands' => [
-            'git status',
-            'composer install --no-interaction --no-dev',
+            'git status' => checkGitStatus(...),
+            'composer install --no-interaction',
         ],
+        // it's also possible to define a global callback
+        'afterExec' => genericCallback(...),
     ],
 
     // ngrok local test
     'git-hook' => [
         'path' => $path,
         'commands' => [
-            'git status',
+            'git status' => checkGitStatus(...),
             'composer install --no-interaction',
         ],
-        // it's also possible to define a callback after commands were executed
-        'afterExec' => function (?LoggerInterface $logger, string $command, string $stdout, string $stderr, string $status) : void {
-            if ($command === 'git status') {
-                if (str_contains($stdout, 'Your branch is up to date with') || str_contains($stdout, 'nothing to commit, working tree clean')) {
-                    return;
-                }
-
-                $logger->error('Git status');
-            }
-        }
+        'afterExec' => genericCallback(...),
     ],
 
-    // an example for laravel
+    // laravel example
     'laravel' => [
         'path' => $path,
         'commands' => [
-            '/usr/bin/git pull',
-            '/usr/local/bin/composer install --no-interaction --no-dev',
-            'php artisan optimize:clear',
-            'php artisan migrate --force',
+            'sudo -H -u ubuntu -- /usr/bin/php artisan down',
+            'sudo -H -u ubuntu -- /usr/bin/git pull',
+            'sudo -H -u ubuntu -- /usr/bin/git status' => checkGitStatus(...),
+            'sudo -H -u ubuntu -- /usr/local/bin/composer install --no-interaction --no-dev',
+            '/usr/bin/php artisan optimize:clear',
+            'sudo -H -u ubuntu -- /usr/bin/php artisan migrate --force',
+            'sudo -H -u ubuntu -- /usr/bin/php artisan up',
         ],
     ],
 ];
@@ -83,4 +79,20 @@ try {
         // REMOVE IN PRODUCTION
         echo $exception->getMessage();
     }
+}
+
+function checkGitStatus(?LoggerInterface $logger, string $command, string $stdout, string $stderr, string $status) : bool
+{
+    if (str_contains($stdout, 'Your branch is up to date with') || str_contains($stdout, 'nothing to commit, working tree clean')) {
+        return true;
+    }
+
+    $logger?->error('git status');
+    return false;
+}
+
+function genericCallback(?LoggerInterface $logger, string $command, string $stdout, string $stderr, string $status) : bool
+{
+    $logger?->debug($command);
+    return true;
 }

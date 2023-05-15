@@ -191,7 +191,15 @@ abstract class AbstractHook
     {
         $commands = is_array($repository['commands']) ? $repository['commands'] : [$repository['commands']];
 
-        foreach ($commands as $command) {
+        foreach ($commands as $key => $value) {
+            if (is_int($key)) {
+                $command = $value;
+                unset($callback);
+            } else {
+                $command = $key;
+                $callback = $value;
+            }
+
             $this->logger?->debug("execute command - {$command}");
 
             $process = proc_open($command, [
@@ -220,13 +228,22 @@ abstract class AbstractHook
                 }
             }
 
-            // call user callback
+            // call command callback
+            if (isset($callback) && is_callable($callback)) {
+                if (call_user_func($callback, $this->logger, $command, $stdout, $stderr, $status) === false) {
+                    throw new Exception("command callback returned false", 409);
+                }
+            }
+
+            // call global callbacks
             if (array_key_exists('afterExec', $repository)) {
                 $callbacks = is_array($repository['afterExec']) ? $repository['afterExec'] : [$repository['afterExec']];
 
                 foreach ($callbacks as $callback) {
                     if (is_callable($callback)) {
-                        call_user_func($callback, $this->logger, $command, $stdout, $stderr, $status);
+                        if (call_user_func($callback, $this->logger, $command, $stdout, $stderr, $status) === false) {
+                            throw new Exception("global callback returned false", 409);
+                        }
                     } else {
                         $this->logger?->error('invalid callback');
                     }
