@@ -23,6 +23,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 $path = __DIR__;
 
 $commands = [
+    // repository name eg. https://github.com/8ctopus/site
     'site' => [
         'path' => $path,
         'commands' => [

@@ -9,9 +9,10 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractHook
 {
-    protected array $config;
-    protected string $secretKey;
-    protected ?LoggerInterface $logger;
+    protected readonly array $config;
+    protected readonly string $secretKey;
+    protected readonly ?LoggerInterface $logger;
+    public readonly string $repositoryName;
 
     /**
      * Constructor
@@ -53,6 +54,7 @@ abstract class AbstractHook
             }
 
             $name = $payload['repository']['name'];
+            $this->repositoryName = $name;
 
             if (!array_key_exists($name, $this->config)) {
                 throw new Exception("unknown repository - {$name}", 401);
