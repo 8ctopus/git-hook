@@ -27,12 +27,12 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "Oct8pus\\": "src/"
+            "Oct8pus\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "tests"
         }
     },
     "scripts": {
@@ -40,7 +40,7 @@
         "fix": "php-cs-fixer fix --verbose",
         "fix-risky": "php-cs-fixer fix --allow-risky=yes --verbose",
         "phpstan": "phpstan analyse --level 9 src",
-        "phpmd": "phpmd src/ text cleancode,codesize,controversial,design,naming,unusedcode"
+        "phpmd": "phpmd src ansi phpmd.xml"
     },
     "replace": {
         "8ctopus/gitea-hook": "*"
