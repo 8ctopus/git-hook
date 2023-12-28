@@ -9,10 +9,10 @@ use Psr\Log\LoggerInterface;
 
 abstract class AbstractHook
 {
+    public readonly string $repositoryName;
     protected readonly array $config;
     protected readonly string $secretKey;
     protected readonly ?LoggerInterface $logger;
-    public readonly string $repositoryName;
 
     /**
      * Constructor
@@ -234,7 +234,7 @@ abstract class AbstractHook
             if (isset($callback)) {
                 if (is_callable($callback)) {
                     if (call_user_func($callback, $this->logger, $command, $stdout, $stderr, $status) === false) {
-                        throw new Exception("command callback returned false", 409);
+                        throw new Exception('command callback returned false', 409);
                     }
                 } else {
                     $this->logger?->error('invalid command callback');
@@ -248,7 +248,7 @@ abstract class AbstractHook
                 foreach ($callbacks as $callback) {
                     if (is_callable($callback)) {
                         if (call_user_func($callback, $this->logger, $command, $stdout, $stderr, $status) === false) {
-                            throw new Exception("global callback returned false", 409);
+                            throw new Exception('global callback returned false', 409);
                         }
                     } else {
                         $this->logger?->error('invalid global callback');

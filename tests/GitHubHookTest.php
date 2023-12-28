@@ -22,7 +22,7 @@ final class GitHubHookTest extends TestCase
 
     public static function setUpBeforeClass() : void
     {
-        static::$commands = [
+        self::$commands = [
             'site' => [
                 'path' => __DIR__ . '/..',
                 'commands' => [
@@ -39,7 +39,7 @@ final class GitHubHookTest extends TestCase
             ],
         ];
 
-        static::$payload = <<<'JSON'
+        self::$payload = <<<'JSON'
         {
             "ref": "refs/heads/master",
             "before":"fc7fc95de2d998e0b41e17cfc3442836bbf1c7c9",
@@ -52,36 +52,36 @@ final class GitHubHookTest extends TestCase
 
         JSON;
 
-        static::$secretKey = 'sd90sfufj';
+        self::$secretKey = 'sd90sfufj';
     }
 
     public function testOK() : void
     {
         $this->mockRequest('POST', '', [], [
-            'payload' => static::$payload,
+            'payload' => self::$payload,
         ]);
 
-        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = 'sha256=' . hash_hmac('sha256', static::$payload, static::$secretKey, false);
+        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = 'sha256=' . hash_hmac('sha256', self::$payload, self::$secretKey, false);
 
         $logger = new Runtime();
 
-        (new GitHubHook(static::$commands, static::$secretKey, $logger))
+        (new GitHubHook(self::$commands, self::$secretKey, $logger))
             ->run();
 
         // no exception will do
         //REM static::assertStringContainsString('nothing to commit', implode("\n", $logger->getItems()));
-        static::assertTrue(true);
+        self::assertTrue(true);
     }
 
     public function testNotPostRequest() : void
     {
         $this->mockRequest('GET', '', []);
 
-        static::expectException(Exception::class);
-        static::expectExceptionMessage('not a POST request - GET');
-        static::expectExceptionCode(401);
+        self::expectException(Exception::class);
+        self::expectExceptionMessage('not a POST request - GET');
+        self::expectExceptionCode(401);
 
-        (new GitHubHook(static::$commands, 'SECRET_KEY'))
+        (new GitHubHook(self::$commands, 'SECRET_KEY'))
             ->run();
     }
 
@@ -89,11 +89,11 @@ final class GitHubHookTest extends TestCase
     {
         $this->mockRequest('POST', '', []);
 
-        static::expectException(Exception::class);
-        static::expectExceptionMessage('no payload');
-        static::expectExceptionCode(401);
+        self::expectException(Exception::class);
+        self::expectExceptionMessage('no payload');
+        self::expectExceptionCode(401);
 
-        (new GitHubHook(static::$commands, 'SECRET_KEY'))
+        (new GitHubHook(self::$commands, 'SECRET_KEY'))
             ->run();
     }
 
@@ -103,11 +103,11 @@ final class GitHubHookTest extends TestCase
             'payload' => 'test',
         ]);
 
-        static::expectException(Exception::class);
-        static::expectExceptionMessage('header signature missing');
-        static::expectExceptionCode(401);
+        self::expectException(Exception::class);
+        self::expectExceptionMessage('header signature missing');
+        self::expectExceptionCode(401);
 
-        (new GitHubHook(static::$commands, 'SECRET_KEY'))
+        (new GitHubHook(self::$commands, 'SECRET_KEY'))
             ->run();
     }
 
@@ -121,11 +121,11 @@ final class GitHubHookTest extends TestCase
 
         $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = 'invalid signature';
 
-        static::expectException(Exception::class);
-        static::expectExceptionMessage('payload signature');
-        static::expectExceptionCode(401);
+        self::expectException(Exception::class);
+        self::expectExceptionMessage('payload signature');
+        self::expectExceptionCode(401);
 
-        (new GitHubHook(static::$commands, static::$secretKey, null))
+        (new GitHubHook(self::$commands, self::$secretKey, null))
             ->run();
     }
 
@@ -137,13 +137,13 @@ final class GitHubHookTest extends TestCase
             'payload' => $payload,
         ]);
 
-        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = hash_hmac('sha256', $payload, static::$secretKey, false);
+        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = hash_hmac('sha256', $payload, self::$secretKey, false);
 
-        static::expectException(Exception::class);
-        static::expectExceptionMessage('invalid payload');
-        static::expectExceptionCode(401);
+        self::expectException(Exception::class);
+        self::expectExceptionMessage('invalid payload');
+        self::expectExceptionCode(401);
 
-        (new GitHubHook(static::$commands, static::$secretKey, null))
+        (new GitHubHook(self::$commands, self::$secretKey, null))
             ->run();
     }
 
@@ -155,13 +155,13 @@ final class GitHubHookTest extends TestCase
             'payload' => $payload,
         ]);
 
-        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = hash_hmac('sha256', $payload, static::$secretKey, false);
+        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = hash_hmac('sha256', $payload, self::$secretKey, false);
 
-        static::expectException(Exception::class);
-        static::expectExceptionMessage('unknown repository - test');
-        static::expectExceptionCode(401);
+        self::expectException(Exception::class);
+        self::expectExceptionMessage('unknown repository - test');
+        self::expectExceptionCode(401);
 
-        (new GitHubHook(static::$commands, static::$secretKey, null))
+        (new GitHubHook(self::$commands, self::$secretKey, null))
             ->run();
     }
 
@@ -173,27 +173,27 @@ final class GitHubHookTest extends TestCase
             'payload' => $payload,
         ]);
 
-        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = hash_hmac('sha256', $payload, static::$secretKey, false);
+        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = hash_hmac('sha256', $payload, self::$secretKey, false);
 
-        static::expectException(Exception::class);
-        static::expectExceptionMessage('json decode - 4');
-        static::expectExceptionCode(401);
+        self::expectException(Exception::class);
+        self::expectExceptionMessage('json decode - 4');
+        self::expectExceptionCode(401);
 
-        (new GitHubHook(static::$commands, static::$secretKey, null))
+        (new GitHubHook(self::$commands, self::$secretKey, null))
             ->run();
     }
 
     public function testInvalidCommand() : void
     {
         $this->mockRequest('POST', '', [], [
-            'payload' => static::$payload,
+            'payload' => self::$payload,
         ]);
 
-        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = hash_hmac('sha256', static::$payload, static::$secretKey, false);
+        $_SERVER['HTTP_X_HUB_SIGNATURE_256'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
 
-        static::expectException(Exception::class);
-        static::expectExceptionMessage('command exit code - 1');
-        static::expectExceptionCode(409);
+        self::expectException(Exception::class);
+        self::expectExceptionMessage('command exit code - 1');
+        self::expectExceptionCode(409);
 
         $logger = new Runtime();
 
@@ -207,14 +207,14 @@ final class GitHubHookTest extends TestCase
                 ],
             ];
 
-            (new GitHubHook($commands, static::$secretKey, $logger))
+            (new GitHubHook($commands, self::$secretKey, $logger))
                 ->run();
         } catch (Exception $exception) {
             $needle = strtoupper(substr(php_uname('s'), 0, 3)) === 'WIN' ?
                 'ERROR \'invalid\' is not recognized as an internal or external command' :
                 'invalid: not found';
 
-            static::assertStringContainsString($needle, implode("\n", $logger->getItems()));
+            self::assertStringContainsString($needle, implode("\n", $logger->getItems()));
 
             throw $exception;
         }

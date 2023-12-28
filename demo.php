@@ -13,8 +13,8 @@
 declare(strict_types=1);
 
 use Apix\Log\Format\ConsoleColors;
-use Apix\Log\Logger\Stream;
 use Apix\Log\Logger;
+use Apix\Log\Logger\Stream;
 use Oct8pus\GitHubHook;
 use Psr\Log\LoggerInterface;
 
@@ -87,10 +87,10 @@ try {
  * Check git is clean
  *
  * @param ?LoggerInterface $logger
- * @param string $command
- * @param string $stdout
- * @param string $stderr
- * @param string $status
+ * @param string           $command
+ * @param string           $stdout
+ * @param string           $stderr
+ * @param string           $status
  *
  * @return bool
  */
