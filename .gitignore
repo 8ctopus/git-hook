@@ -3,9 +3,9 @@
 /vendor/
 
 # phpunit
-/coverage/
 /.phpunit.result.cache
+/coverage/
 
-# misc.
+# other
 /*.sublime-workspace
 /.php-cs-fixer.cache
