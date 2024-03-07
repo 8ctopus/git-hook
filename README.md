@@ -10,6 +10,8 @@
 
 Automate deployment for git pushes to [GitHub](https://github.com) and [Gitea](https://gitea.io) using webhooks.
 
+Automatically push your git repository changes to any website.
+
 ## demo
 
 - git clone the repository
