@@ -15,6 +15,7 @@ declare(strict_types=1);
 use Apix\Log\Format\ConsoleColors;
 use Apix\Log\Logger;
 use Apix\Log\Logger\Stream;
+use HttpSoft\ServerRequest\ServerRequestCreator;
 use Oct8pus\GitHubHook;
 use Psr\Log\LoggerInterface;
 
@@ -66,7 +67,9 @@ try {
 
     $logger->debug('Git hook...');
 
-    (new GitHubHook($commands, 'SECRET_KEY', $logger))
+    $request = ServerRequestCreator::createFromGlobals($_SERVER, $_FILES, $_COOKIE, $_GET, $_POST);
+
+    (new GitHubHook($request, $commands, 'SECRET_KEY', $logger))
         ->run();
 
     if ($logger->getMinLevelLogged() >= Logger::getLevelCode('notice')) {

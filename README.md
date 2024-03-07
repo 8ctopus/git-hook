@@ -34,6 +34,7 @@ curl \
 
 ```php
 use Apix\Log\Logger\File;
+use HttpSoft\ServerRequest\ServerRequestCreator;
 use Oct8pus\GitHubHook;
 
 // assuming script is in DOCUMENT_ROOT/public/api/myhook/index.php
@@ -61,7 +62,9 @@ $logger = new File(sys_get_temp_dir() . '/git-hook-' . date('Y-m-d-His') . '.log
 try {
     $logger->info('Git hook...');
 
-    (new GitHubHook($commands, 'SAME_SECRET_KEY_AS_IN_GITHUB_ADMIN', $logger))
+    $request = ServerRequestCreator::createFromGlobals($_SERVER, $_FILES, $_COOKIE, $_GET, $_POST);
+
+    (new GitHubHook($request, $commands, 'SAME_SECRET_KEY_AS_IN_GITHUB_ADMIN', $logger))
         ->run();
 
     $logger->notice('Git hook - OK');
@@ -95,6 +98,7 @@ _Note_: Also read the important notes below.
 declare(strict_types=1);
 
 use Apix\Log\Logger\File;
+use HttpSoft\ServerRequest\ServerRequestCreator;
 use Oct8pus\GiteaHook;
 
 // assuming script is in DOCUMENT_ROOT/public/api/myhook/index.php
@@ -120,8 +124,9 @@ $logger = new File(sys_get_temp_dir() . '/git-hook-' . date('Y-m-d-His') . '.log
 try {
     $logger->info('Git hook...');
 
-    // use for gitea
-    (new GiteaHook($commands, 'SAME_SECRET_KEY_AS_IN_GITEA_ADMIN', $logger))
+    $request = ServerRequestCreator::createFromGlobals($_SERVER, $_FILES, $_COOKIE, $_GET, $_POST);
+
+    (new GiteaHook($request, $commands, 'SAME_SECRET_KEY_AS_IN_GITEA_ADMIN', $logger))
         ->run();
 
     $logger->notice('Git hook - OK');
@@ -216,13 +221,9 @@ Returning false aborts the deployment
 The deployment script can be easily debugged locally using [ngrok](https://ngrok.com/).
 
 - run ngrok `ngrok http 80`
-
 - update the `Payload URL` for Github or `Target URL` for Gitea to the ngrok address, similar to this one `https://6daf-31-218-13-51.ngrok-free.app`
-
 - run the php local server `php -S localhost:80 demo.php`
-
 - start visual studio code debugging and set a breakpoint in `demo.php`
-
 - resend the webhook request
 
 ## clean code

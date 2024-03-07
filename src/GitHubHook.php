@@ -10,8 +10,7 @@ class GitHubHook extends AbstractHook
 {
     protected function headerSignature() : string
     {
-        // get header signature
-        $signature = $_SERVER['HTTP_X_HUB_SIGNATURE_256'] ?? null;
+        $signature = $this->request->getServerParams()['HTTP_X_HUB_SIGNATURE_256'] ?? null;
 
         if (empty($signature)) {
             throw new Exception('header signature missing', 401);

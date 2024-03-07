@@ -58,15 +58,15 @@ final class GiteaHookTest extends TestCase
 
     public function testOK() : void
     {
-        $this->mockRequest('POST', '', [], [
-            'payload' => self::$payload,
-        ]);
+        $server['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
+        $request = $this->mockServerRequest('POST', '', [
+            'payload' => self::$payload,
+        ], $server);
 
         $logger = new Runtime();
 
-        (new GiteaHook(self::$commands, self::$secretKey, $logger))
+        (new GiteaHook($request, self::$commands, self::$secretKey, $logger))
             ->run();
 
         // no exception will do
@@ -76,11 +76,11 @@ final class GiteaHookTest extends TestCase
 
     public function testGlobalCallbackOK() : void
     {
-        $this->mockRequest('POST', '', [], [
-            'payload' => self::$payload,
-        ]);
+        $server['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
+        $request = $this->mockServerRequest('POST', '', [
+            'payload' => self::$payload,
+        ], $server);
 
         $logger = new Runtime();
 
@@ -88,12 +88,13 @@ final class GiteaHookTest extends TestCase
 
         $commands = self::$commands;
 
+        /** @disregard P1003 */
         $commands['site']['afterExec'] = function (?LoggerInterface $logger, string $command, string $stdout, string $stderr, string $status) use (&$callback) : bool {
             ++$callback;
             return true;
         };
 
-        (new GiteaHook($commands, self::$secretKey, $logger))
+        (new GiteaHook($request, $commands, self::$secretKey, $logger))
             ->run();
 
         self::assertSame(2, $callback);
@@ -101,16 +102,17 @@ final class GiteaHookTest extends TestCase
 
     public function testGlobalCallbackAbort() : void
     {
-        $this->mockRequest('POST', '', [], [
-            'payload' => self::$payload,
-        ]);
+        $server['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
+        $request = $this->mockServerRequest('POST', '', [
+            'payload' => self::$payload,
+        ], $server);
 
         $logger = new Runtime();
 
         $commands = self::$commands;
 
+        /** @disregard P1003 */
         $commands['site']['afterExec'] = function (?LoggerInterface $logger, string $command, string $stdout, string $stderr, string $status) use (&$callback) : bool {
             return false;
         };
@@ -119,17 +121,17 @@ final class GiteaHookTest extends TestCase
         self::expectExceptionMessage('global callback returned false');
         self::expectExceptionCode(409);
 
-        (new GiteaHook($commands, self::$secretKey, $logger))
+        (new GiteaHook($request, $commands, self::$secretKey, $logger))
             ->run();
     }
 
     public function testCommandCallbackAbort() : void
     {
-        $this->mockRequest('POST', '', [], [
-            'payload' => self::$payload,
-        ]);
+        $server['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
+        $request = $this->mockServerRequest('POST', '', [
+            'payload' => self::$payload,
+        ], $server);
 
         $commands = [
             'site' => [
@@ -152,37 +154,37 @@ final class GiteaHookTest extends TestCase
         self::expectExceptionMessage('command callback returned false');
         self::expectExceptionCode(409);
 
-        (new GiteaHook($commands, self::$secretKey, null))
+        (new GiteaHook($request, $commands, self::$secretKey, null))
             ->run();
     }
 
     public function testNotPostRequest() : void
     {
-        $this->mockRequest('GET', '', []);
+        $request = $this->mockServerRequest('GET', '');
 
         self::expectException(Exception::class);
         self::expectExceptionMessage('not a POST request - GET');
         self::expectExceptionCode(401);
 
-        (new GiteaHook(self::$commands, 'SECRET_KEY'))
+        (new GiteaHook($request, self::$commands, 'SECRET_KEY'))
             ->run();
     }
 
     public function testNoPayload() : void
     {
-        $this->mockRequest('POST', '', []);
+        $request = $this->mockServerRequest('POST', '');
 
         self::expectException(Exception::class);
         self::expectExceptionMessage('no payload');
         self::expectExceptionCode(401);
 
-        (new GiteaHook(self::$commands, 'SECRET_KEY'))
+        (new GiteaHook($request, self::$commands, 'SECRET_KEY'))
             ->run();
     }
 
     public function testHeaderSignatureMissing() : void
     {
-        $this->mockRequest('POST', '', [], [
+        $request = $this->mockServerRequest('POST', '', [
             'payload' => 'test',
         ]);
 
@@ -190,89 +192,85 @@ final class GiteaHookTest extends TestCase
         self::expectExceptionMessage('header signature missing');
         self::expectExceptionCode(401);
 
-        (new GiteaHook(self::$commands, 'SECRET_KEY'))
+        (new GiteaHook($request, self::$commands, 'SECRET_KEY'))
             ->run();
     }
 
     public function testInvalidPayloadSignature() : void
     {
         $payload = 'test';
+        $server['HTTP_X_GITEA_SIGNATURE'] = 'invalid signature';
 
-        $this->mockRequest('POST', '', [], [
+        $request = $this->mockServerRequest('POST', '', [
             'payload' => $payload,
-        ]);
-
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = 'invalid signature';
+        ], $server);
 
         self::expectException(Exception::class);
         self::expectExceptionMessage('payload signature');
         self::expectExceptionCode(401);
 
-        (new GiteaHook(self::$commands, self::$secretKey, null))
+        (new GiteaHook($request, self::$commands, self::$secretKey, null))
             ->run();
     }
 
     public function testInvalidPayload() : void
     {
         $payload = '{"test":1}';
+        $server['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, self::$secretKey, false);
 
-        $this->mockRequest('POST', '', [], [
+        $request = $this->mockServerRequest('POST', '', [
             'payload' => $payload,
-        ]);
-
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, self::$secretKey, false);
+        ], $server);
 
         self::expectException(Exception::class);
         self::expectExceptionMessage('invalid payload');
         self::expectExceptionCode(401);
 
-        (new GiteaHook(self::$commands, self::$secretKey, null))
+        (new GiteaHook($request, self::$commands, self::$secretKey, null))
             ->run();
     }
 
     public function testInvalidRepository() : void
     {
         $payload = '{"repository": {"name": "test"}}';
+        $server['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, self::$secretKey, false);
 
-        $this->mockRequest('POST', '', [], [
+        $request = $this->mockServerRequest('POST', '', [
             'payload' => $payload,
-        ]);
-
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, self::$secretKey, false);
+        ], $server);
 
         self::expectException(Exception::class);
         self::expectExceptionMessage('unknown repository - test');
         self::expectExceptionCode(401);
 
-        (new GiteaHook(self::$commands, self::$secretKey, null))
+        (new GiteaHook($request, self::$commands, self::$secretKey, null))
             ->run();
     }
 
     public function testPayloadJsonDecode() : void
     {
         $payload = 'test';
+        $server['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, self::$secretKey, false);
 
-        $this->mockRequest('POST', '', [], [
+        $request = $this->mockServerRequest('POST', '', [
             'payload' => $payload,
-        ]);
-
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', $payload, self::$secretKey, false);
+        ], $server);
 
         self::expectException(Exception::class);
         self::expectExceptionMessage('json decode - 4');
         self::expectExceptionCode(401);
 
-        (new GiteaHook(self::$commands, self::$secretKey, null))
+        (new GiteaHook($request, self::$commands, self::$secretKey, null))
             ->run();
     }
 
     public function testPathMissing() : void
     {
-        $this->mockRequest('POST', '', [], [
-            'payload' => self::$payload,
-        ]);
+        $server['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
+        $request = $this->mockServerRequest('POST', '', [
+            'payload' => self::$payload,
+        ], $server);
 
         self::expectException(Exception::class);
         self::expectExceptionMessage('path missing - site');
@@ -286,17 +284,17 @@ final class GiteaHookTest extends TestCase
             ],
         ];
 
-        (new GiteaHook($commands, self::$secretKey))
+        (new GiteaHook($request, $commands, self::$secretKey))
             ->run();
     }
 
     public function testCommandsMissing() : void
     {
-        $this->mockRequest('POST', '', [], [
-            'payload' => self::$payload,
-        ]);
+        $server['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
+        $request = $this->mockServerRequest('POST', '', [
+            'payload' => self::$payload,
+        ], $server);
 
         self::expectException(Exception::class);
         self::expectExceptionMessage('commands missing - site');
@@ -308,17 +306,17 @@ final class GiteaHookTest extends TestCase
             ],
         ];
 
-        (new GiteaHook($commands, self::$secretKey))
+        (new GiteaHook($request, $commands, self::$secretKey))
             ->run();
     }
 
     public function testInvalidCommand() : void
     {
-        $this->mockRequest('POST', '', [], [
-            'payload' => self::$payload,
-        ]);
+        $server['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
 
-        $_SERVER['HTTP_X_GITEA_SIGNATURE'] = hash_hmac('sha256', self::$payload, self::$secretKey, false);
+        $request = $this->mockServerRequest('POST', '', [
+            'payload' => self::$payload,
+        ], $server);
 
         self::expectException(Exception::class);
         self::expectExceptionMessage('command exit code - 1');
@@ -336,7 +334,7 @@ final class GiteaHookTest extends TestCase
                 ],
             ];
 
-            (new GiteaHook($commands, self::$secretKey, $logger))
+            (new GiteaHook($request, $commands, self::$secretKey, $logger))
                 ->run();
         } catch (Exception $exception) {
             $needle = strtoupper(substr(php_uname('s'), 0, 3)) === 'WIN' ?

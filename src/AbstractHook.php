@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Oct8pus;
 
 use Exception;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractHook
 {
     public readonly string $repositoryName;
+    protected readonly ServerRequestInterface $request;
     protected readonly array $config;
     protected readonly string $secretKey;
     protected readonly ?LoggerInterface $logger;
@@ -17,12 +19,14 @@ abstract class AbstractHook
     /**
      * Constructor
      *
+     * @param ServerRequestInterface $request
      * @param array            $commands
      * @param string           $secretKey
      * @param ?LoggerInterface $logger
      */
-    public function __construct(array $commands, string $secretKey, ?LoggerInterface $logger = null)
+    public function __construct(ServerRequestInterface $request, array $commands, string $secretKey, ?LoggerInterface $logger = null)
     {
+        $this->request = $request;
         $this->config = $commands;
         $this->secretKey = $secretKey;
         $this->logger = $logger;
@@ -86,12 +90,13 @@ abstract class AbstractHook
      */
     protected function validateRequest() : void
     {
-        // check for POST request
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $method = $this->request->getMethod();
+
+        if ($method === 'POST') {
             return;
         }
 
-        throw new Exception("not a POST request - {$_SERVER['REQUEST_METHOD']}", 401);
+        throw new Exception("not a POST request - {$method}", 401);
     }
 
     /**
@@ -103,8 +108,10 @@ abstract class AbstractHook
      */
     protected function payload() : string
     {
+        $server = $this->request->getServerParams();
+
         // get content type
-        $contentType = mb_strtolower(trim($_SERVER['CONTENT_TYPE'] ?? ''));
+        $contentType = mb_strtolower(trim($server['CONTENT_TYPE'] ?? ''));
 
         switch ($contentType) {
             case 'application/json':
@@ -114,7 +121,7 @@ abstract class AbstractHook
 
             case '':
                 // get payload
-                $payload = $_POST['payload'] ?? '';
+                $payload = $this->request->getParsedBody()['payload'] ?? '';
                 break;
 
             default:
