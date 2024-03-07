@@ -99,6 +99,11 @@ try {
  */
 function checkGitStatus(?LoggerInterface $logger, string $command, string $stdout, string $stderr, string $status) : bool
 {
+    // for intelephense
+    $command = $command;
+    $stderr = $stderr;
+    $status = $status;
+
     if (str_contains($stdout, 'Your branch is up to date with') || str_contains($stdout, 'nothing to commit, working tree clean')) {
         return true;
     }
@@ -109,6 +114,11 @@ function checkGitStatus(?LoggerInterface $logger, string $command, string $stdou
 
 function checkGitBranch(?LoggerInterface $logger, string $command, string $stdout, string $stderr, string $status) : bool
 {
+    // for intelephense
+    $command = $command;
+    $stderr = $stderr;
+    $status = $status;
+
     if (preg_match('/^\* ([a-zA-Z]*)$/', $stdout, $matches) !== 1) {
         $logger?->error('detect branch');
         return false;
@@ -126,6 +136,12 @@ function checkGitBranch(?LoggerInterface $logger, string $command, string $stdou
 
 function genericCallback(?LoggerInterface $logger, string $command, string $stdout, string $stderr, string $status) : bool
 {
+    // for intelephense
+    $command = $command;
+    $stdout = $stdout;
+    $stderr = $stderr;
+    $status = $status;
+
     $logger?->debug($command);
     return true;
 }
