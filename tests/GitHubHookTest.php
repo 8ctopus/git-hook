@@ -69,7 +69,6 @@ final class GitHubHookTest extends TestCase
             ->run();
 
         // no exception will do
-        //REM static::assertStringContainsString('nothing to commit', implode("\n", $logger->getItems()));
         self::assertTrue(true);
     }
 

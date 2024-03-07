@@ -72,7 +72,6 @@ final class GiteaHookTest extends TestCase
 
         // no exception will do
         self::assertTrue(true);
-        //REM static::assertStringContainsString('nothing to commit', implode("\n", $logger->getItems()));
     }
 
     public function testOKApplicationJson() : void
@@ -89,7 +88,6 @@ final class GiteaHookTest extends TestCase
 
         // no exception will do
         self::assertTrue(true);
-        //REM static::assertStringContainsString('nothing to commit', implode("\n", $logger->getItems()));
     }
 
     public function testGlobalCallbackOK() : void
