@@ -30,10 +30,10 @@ abstract class TestCase extends BaseTestCase
     /**
      * Mock server request
      *
-     * @param  string                 $method
-     * @param  string                 $path
-     * @param  array                  $params
-     * @param  array                  $server
+     * @param string $method
+     * @param string $path
+     * @param array  $params
+     * @param array  $server
      *
      * @return ServerRequestInterface
      */

@@ -20,9 +20,9 @@ abstract class AbstractHook
      * Constructor
      *
      * @param ServerRequestInterface $request
-     * @param array            $commands
-     * @param string           $secretKey
-     * @param ?LoggerInterface $logger
+     * @param array                  $commands
+     * @param string                 $secretKey
+     * @param ?LoggerInterface       $logger
      */
     public function __construct(ServerRequestInterface $request, array $commands, string $secretKey, ?LoggerInterface $logger = null)
     {
