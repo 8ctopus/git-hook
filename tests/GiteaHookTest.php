@@ -7,6 +7,7 @@ namespace Tests;
 use Apix\Log\Logger\Runtime;
 use Exception;
 use Oct8pus\GiteaHook;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -67,6 +68,23 @@ final class GiteaHookTest extends TestCase
         $logger = new Runtime();
 
         (new GiteaHook($request, self::$commands, self::$secretKey, $logger))
+            ->run();
+
+        // no exception will do
+        self::assertTrue(true);
+        //REM static::assertStringContainsString('nothing to commit', implode("\n", $logger->getItems()));
+    }
+
+    public function testOKApplicationJson() : void
+    {
+        $server = [
+            'HTTP_X_GITEA_SIGNATURE' => hash_hmac('sha256', self::$payload, self::$secretKey, false),
+            'CONTENT_TYPE' => 'application/json',
+        ];
+
+        $request = $this->mockServerRequest('POST', '', [], $server);
+
+        (new GiteaHookMock($request, self::$commands, self::$secretKey, self::$payload))
             ->run();
 
         // no exception will do

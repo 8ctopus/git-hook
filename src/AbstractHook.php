@@ -116,7 +116,7 @@ abstract class AbstractHook
         switch ($contentType) {
             case 'application/json':
                 // get RAW post data
-                $payload = trim(file_get_contents('php://input'));
+                $payload = $this->input();
                 break;
 
             case '':
@@ -133,6 +133,16 @@ abstract class AbstractHook
         }
 
         return $payload;
+    }
+
+    /**
+     * Get input
+     *
+     * @return string
+     */
+    protected function input() : string
+    {
+        return trim(file_get_contents('php://input'));
     }
 
     /**
