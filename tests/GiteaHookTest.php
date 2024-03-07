@@ -212,6 +212,22 @@ final class GiteaHookTest extends TestCase
             ->run();
     }
 
+    public function testInvalidPayloadType() : void
+    {
+        $server['CONTENT_TYPE'] = 'text/plain';
+
+        $request = $this->mockServerRequest('POST', '', [
+            'payload' => 'test',
+        ], $server);
+
+        self::expectException(Exception::class);
+        self::expectExceptionMessage('unknown content type - text/plain');
+        self::expectExceptionCode(401);
+
+        (new GiteaHook($request, self::$commands, 'SECRET_KEY'))
+            ->run();
+    }
+
     public function testInvalidPayloadSignature() : void
     {
         $payload = 'test';

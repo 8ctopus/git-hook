@@ -142,7 +142,9 @@ abstract class AbstractHook
      */
     protected function input() : string
     {
+        // @codeCoverageIgnoreStart
         return trim(file_get_contents('php://input'));
+        // @codeCoverageIgnoreEnd
     }
 
     /**
