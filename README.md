@@ -1,9 +1,9 @@
 # git hook
 
-[![packagist](http://poser.pugx.org/8ctopus/git-hook/v)](https://packagist.org/packages/8ctopus/git-hook)
-[![downloads](http://poser.pugx.org/8ctopus/git-hook/downloads)](https://packagist.org/packages/8ctopus/git-hook)
-[![min php version](http://poser.pugx.org/8ctopus/git-hook/require/php)](https://packagist.org/packages/8ctopus/git-hook)
-[![license](http://poser.pugx.org/8ctopus/git-hook/license)](https://packagist.org/packages/8ctopus/git-hook)
+[![packagist](https://poser.pugx.org/8ctopus/git-hook/v)](https://packagist.org/packages/8ctopus/git-hook)
+[![downloads](https://poser.pugx.org/8ctopus/git-hook/downloads)](https://packagist.org/packages/8ctopus/git-hook)
+[![min php version](https://poser.pugx.org/8ctopus/git-hook/require/php)](https://packagist.org/packages/8ctopus/git-hook)
+[![license](https://poser.pugx.org/8ctopus/git-hook/license)](https://packagist.org/packages/8ctopus/git-hook)
 [![tests](https://github.com/8ctopus/git-hook/actions/workflows/tests.yml/badge.svg)](https://github.com/8ctopus/git-hook/actions/workflows/tests.yml)
 ![code coverage badge](https://raw.githubusercontent.com/8ctopus/git-hook/image-data/coverage.svg)
 ![lines of code](https://raw.githubusercontent.com/8ctopus/git-hook/image-data/lines.svg)
