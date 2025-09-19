@@ -7,7 +7,6 @@ namespace Tests;
 use Apix\Log\Logger\Runtime;
 use Exception;
 use Oct8pus\GiteaHook;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
 /**
