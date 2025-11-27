@@ -35,3 +35,4 @@ abstract class TestCase extends BaseTestCase
         return new ServerRequest($server, [], [], [], $params, $method, $path, [], null, '1.1');
     }
 }
+
